@@ -25,7 +25,7 @@ pos calc_pos_2D3A_ite(double SX,double SY,double SZ,double AX,double AY,double A
 	double rS,rA,rB;
 
 	int iter_num;
-    int loop_run;
+    	int loop_run;
 
 	double M11,M12;
 	double M21,M22;
@@ -48,7 +48,7 @@ pos calc_pos_2D3A_ite(double SX,double SY,double SZ,double AX,double AY,double A
 		iter_num = iter_num + 1;
 		
 		rS = sqrt( pow((SX-TX),2) + pow((SY-TY),2) + pow((SZ-TZ),2) );
-        rA=rS+dist_diff_A_S;
+        	rA=rS+dist_diff_A_S;
 		rB=rS+dist_diff_B_S;
 
 		M11 = 2.0*(SX-AX);
@@ -75,7 +75,7 @@ pos calc_pos_2D3A_ite(double SX,double SY,double SZ,double AX,double AY,double A
 	  
 	tagpos.TXcm = (int)(TX*100);
 	tagpos.TYcm = (int)(TY*100);
-    tagpos.TZcm = (int)(TZ*100);
+    	tagpos.TZcm = (int)(TZ*100);
 
 	return tagpos;
 }
