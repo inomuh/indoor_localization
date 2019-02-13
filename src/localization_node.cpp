@@ -118,6 +118,7 @@ int main(int argc, char *argv[])
 	
     while (ros::ok()) 
     {
+	    
         msg.X = tagpos.TXcm;
         msg.Y = tagpos.TYcm;
         msg.Z = tagpos.TZcm;
