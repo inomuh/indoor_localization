@@ -120,7 +120,7 @@ int main(int argc, char *argv[])
     {
         msg.X = tagpos.TXcm;
         msg.Y = tagpos.TYcm;
-        msg.Y = tagpos.TZcm;
+        msg.Z = tagpos.TZcm;
 
         ROS_INFO("\nTX = %f \nTY = %f \nTZ = %f \n\n", msg.X, msg.Y, msg.Z);
 
