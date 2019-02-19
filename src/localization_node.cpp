@@ -110,6 +110,7 @@ int main(int argc, char* argv[])
   // Loop rate is 1Hz
   ros::Rate loop_rate(1);
 
+<<<<<<< HEAD
   indoor_localization::AnchorScan msg;
 
 
@@ -120,6 +121,16 @@ int main(int argc, char* argv[])
     msg.X = tagpos.TXcm;
     msg.Y = tagpos.TYcm;
     msg.Z = tagpos.TZcm;
+=======
+    tagpos = calc_pos_2D3A_ite(SX,SY,SZ,AX,AY,AZ,BX,BY,BZ,TZ,dist_diff_A_S,dist_diff_B_S);
+	
+    while (ros::ok()) 
+    {
+	    
+        msg.X = tagpos.TXcm;
+        msg.Y = tagpos.TYcm;
+        msg.Z = tagpos.TZcm;
+>>>>>>> b67c90c18159e865cfd147befc60712dc6e7b081
 
     ROS_INFO("\nTX = %f \nTY = %f \nTZ = %f \n\n", msg.X, msg.Y, msg.Z);
 
