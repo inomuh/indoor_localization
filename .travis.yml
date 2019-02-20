@@ -8,14 +8,6 @@ env:
 
 install:
   - git clone --quiet --depth 1 https://github.com/ros-industrial/industrial_ci.git .industrial_ci
-  - sudo sh -c 'echo "deb http://packages.ros.org/ros/ubuntu $ROS_DISTRO main" > /etc/apt/sources.list.d/ros-latest.list'
-  - wget http://packages.ros.org/ros.key -O - | sudo apt-key add -
-  - sudo apt-get update -qq
-  - sudo apt-get install -qq -y python-rosdep python-catkin-tools
-  - sudo rosdep init
-  - rosdep update
-  # Use rosdep to install all dependencies (including ROS itself)
-  - rosdep install --from-paths ./ -i -y --rosdistro $ROS_DISTRO
   - sudo apt-get install ros-$ROS_DISTRO-rostest
 
 script:
