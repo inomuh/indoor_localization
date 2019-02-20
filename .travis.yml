@@ -8,8 +8,7 @@ env:
 
 install:
   - git clone --quiet --depth 1 https://github.com/ros-industrial/industrial_ci.git .industrial_ci
+  - sudo apt-get install ros-$ROS_DISTRO-rostests
 
 script:
   - .industrial_ci/travis.sh
-  - catkin_make
-  - catkin_make run_tests
