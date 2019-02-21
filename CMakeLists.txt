@@ -13,7 +13,7 @@ find_package(catkin REQUIRED COMPONENTS
   rospy
   std_msgs
 )
-
+find_package(rostest REQUIRED)
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
 
@@ -195,15 +195,18 @@ target_link_libraries(localization_node  ${catkin_LIBRARIES})
 ## Testing ##
 #############
 
+add_rostest_gtest(localization_node_test test/localization_node_test.cpp src/localization_node.cpp)
+target_link_libraries(localization_node_test ${catkin_LIBRARIES})
+
 ## Add gtest based cpp test target and link libraries
 # catkin_add_gtest(${PROJECT_NAME}-test test/test_indoor_localization.cpp)
 # if(TARGET ${PROJECT_NAME}-test)
 #   target_link_libraries(${PROJECT_NAME}-test ${PROJECT_NAME})
 # endif()
-
-   catkin_add_gtest(localization_node_test test/localization_node_test.cpp)
-   target_link_libraries(localization_node_test indoor_localization)
-   target_link_libraries(localization_node_test ${catkin_LIBRARIES})
-
+#####################################################################################
+#   catkin_add_gtest(localization_node_test test/localization_node_test.cpp)
+#   target_link_libraries(localization_node_test indoor_localization)
+#   target_link_libraries(localization_node_test ${catkin_LIBRARIES})
+#####################################################################################
 ## Add folders to be run by python nosetests
 # catkin_add_nosetests(test)
