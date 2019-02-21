@@ -12,5 +12,4 @@ install:
   - git clone --quiet --depth 1 https://github.com/ros-industrial/industrial_ci.git .industrial_ci
 
 script:
-- sudo su
-- .industrial_ci/industrial_ci/src/tests/source_tests.sh
+- .industrial_ci/travis.sh
