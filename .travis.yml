@@ -11,5 +11,5 @@ install:
   - git clone --quiet --depth 1 https://github.com/ros-industrial/industrial_ci.git .industrial_ci
 
 script:
-  - source /opt/$ROS_DISTRO/setup.bash
+  - source /opt/ros/$ROS_DISTRO/setup.bash
   - .industrial_ci/travis.sh
