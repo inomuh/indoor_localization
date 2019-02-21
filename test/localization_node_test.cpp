@@ -30,7 +30,7 @@ TEST(IndoorTest , value)
 	tagpos = calcPos2D3AIte(SX, SY, SZ, AX, AY, AZ, BX, BY, BZ, TZ, dist_diff_A_S, dist_diff_B_S);
 
 	ASSERT_EQ(tagpos.TXcm,213);
-	ASSERT_EQ(tagpos.TYcm,141);
+	ASSERT_EQ(tagpos.TYcm,173);
 	ASSERT_EQ(tagpos.TZcm,172);
 }
 
