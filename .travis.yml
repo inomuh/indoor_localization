@@ -12,4 +12,6 @@ install:
   - git clone --quiet --depth 1 https://github.com/ros-industrial/industrial_ci.git .industrial_ci
 
 script:
-  - .industrial_ci/industrial_ci/src/tests/source_tests.sh
+  - cd industrial_ci/industrial_ci/src/tests
+  - chmod 777 source_tests.sh
+  - ./source_tests.sh
