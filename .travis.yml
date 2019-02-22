@@ -10,7 +10,7 @@ env:
 
 install:
   - git clone --quiet --depth 1 https://github.com/ros-industrial/industrial_ci.git .industrial_ci
-  - sudo apt-get install -y  ros-$ROS_DISTRO-rostest
+  - sudo apt-get install -y -qq ros-$ROS_DISTRO-rostest
   - source /opt/ros/$ROS_DISTRO/setup.bash
   # Prepare rosdep to install dependencies.
   - sudo rosdep init
