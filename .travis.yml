@@ -1,4 +1,6 @@
+sudo: required
 language: generic
+dist: xenial
 services:
   - docker
 dist: xenial
@@ -8,9 +10,16 @@ env:
 
 install:
   - git clone --quiet --depth 1 https://github.com/ros-industrial/industrial_ci.git .industrial_ci
+<<<<<<< HEAD
   - 
 
 script:
   - .industrial_ci/travis.sh
 
 
+=======
+
+  
+script:
+- .industrial_ci/travis.sh
+>>>>>>> a082274a205d475ec44d55ac2060603a99c7c02a
