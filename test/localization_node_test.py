@@ -18,4 +18,4 @@ class TestLocalizationNode(unittest.TestCase):
 		
 if __name__ == '__main__':
 	import rosunit
-	rosunit.unitrun(PKG, NAME, TestLocalizationNode, sysargs = None, coverage_packages=None)
+	rosunit.unitrun(PKG, NAME, TestLocalizationNode, sysargs = None, coverage_packages=['indoor_localization'])
