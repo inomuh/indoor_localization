@@ -15,6 +15,7 @@ find_package(catkin REQUIRED COMPONENTS
   rostest
 )
 
+
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
 
@@ -22,7 +23,7 @@ find_package(catkin REQUIRED COMPONENTS
 ## Uncomment this if the package has a setup.py. This macro ensures
 ## modules and global scripts declared therein get installed
 ## See http://ros.org/doc/api/catkin/html/user_guide/setup_dot_py.html
-# catkin_python_setup()
+ catkin_python_setup()
 
 ################################################
 ## Declare ROS messages, services and actions ##
@@ -122,10 +123,6 @@ include_directories(
 # include
   ${catkin_INCLUDE_DIRS}
 )
-add_library(indoor_localization src/localization_node.cpp)
-add_executable(localization_node src/localization_node.cpp)
-add_dependencies(localization_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-target_link_libraries(localization_node  ${catkin_LIBRARIES})
 
 ## Declare a C++ library
 # add_library(${PROJECT_NAME}
@@ -166,10 +163,10 @@ target_link_libraries(localization_node  ${catkin_LIBRARIES})
 
 ## Mark executable scripts (Python etc.) for installation
 ## in contrast to setup.py, you can choose the destination
-# install(PROGRAMS
-#   scripts/my_python_script
-#   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
-# )
+ install(PROGRAMS
+   src/indoor_localization/localization_node.py
+   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+ )
 
 ## Mark executables and/or libraries for installation
 # install(TARGETS ${PROJECT_NAME} ${PROJECT_NAME}_node
@@ -195,16 +192,17 @@ target_link_libraries(localization_node  ${catkin_LIBRARIES})
 #############
 ## Testing ##
 #############
-
+catkin_add_nosetests(test/localization_node_test.py)
 ## Add gtest based cpp test target and link libraries
 # catkin_add_gtest(${PROJECT_NAME}-test test/test_indoor_localization.cpp)
 # if(TARGET ${PROJECT_NAME}-test)
 #   target_link_libraries(${PROJECT_NAME}-test ${PROJECT_NAME})
 # endif()
-
-   catkin_add_gtest(localization_node_test test/localization_node_test.cpp)
-   target_link_libraries(localization_node_test indoor_localization)
-   target_link_libraries(localization_node_test ${catkin_LIBRARIES})
-
+####################################################################
+#   catkin_add_gtest(localization_node_test test/localization_node_test.cpp)
+#   target_link_libraries(localization_node_test indoor_localization)
+#   target_link_libraries(localization_node_test ${catkin_LIBRARIES})
+######################################################################
 ## Add folders to be run by python nosetests
 # catkin_add_nosetests(test)
+

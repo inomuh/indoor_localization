@@ -1,0 +1,6 @@
+<?xml version="1.0"?>
+<launch>
+	<node pkg="indoor_localization" name="localization_node" type="localization_node.py">
+		<rosparam file="$(find indoor_localization)/params/localization_params.yaml" command="load"/>
+	</node>
+</launch>

@@ -1,16 +1,16 @@
 language: generic
 services:
   - docker
-
+dist: xenial
 env:
   matrix:
     - ROS_DISTRO="kinetic"
 
 install:
   - git clone --quiet --depth 1 https://github.com/ros-industrial/industrial_ci.git .industrial_ci
-<<<<<<< HEAD
+  - 
 
-=======
->>>>>>> b67c90c18159e865cfd147befc60712dc6e7b081
 script:
   - .industrial_ci/travis.sh
+
+
