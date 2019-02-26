@@ -13,3 +13,4 @@ install:
   
 script:
   - .industrial_ci/travis.sh
+  - catkin_make
