@@ -1,0 +1,12 @@
+Source: ros-kinetic-indoor-localization
+Section: misc
+Priority: extra
+Maintainer: Elcin Erdogan <elcin.erdogan@inovasyonmuhendislik.com>
+Build-Depends: debhelper (>= 9.0.0), ros-kinetic-catkin, ros-kinetic-message-generation, ros-kinetic-nav-msgs, ros-kinetic-roscpp, ros-kinetic-rospy, ros-kinetic-rostest, ros-kinetic-std-msgs
+Homepage: 
+Standards-Version: 3.9.2
+
+Package: ros-kinetic-indoor-localization
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, ros-kinetic-message-runtime, ros-kinetic-nav-msgs, ros-kinetic-roscpp, ros-kinetic-rospy, ros-kinetic-rostest, ros-kinetic-std-msgs
+Description: The indoor_localization package
