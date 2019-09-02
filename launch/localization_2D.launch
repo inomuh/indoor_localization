@@ -1,0 +1,43 @@
+<?xml version="1.0"?>
+<launch>
+
+
+	<node pkg="indoor_localization" name="plab_data_publish_node" type="plab_data_publish_node.py" output="screen"/>
+
+
+	<!--
+	<node pkg="indoor_localization" name="simulator" type="simulator.py" output="screen">
+		<rosparam file="$(find indoor_localization)/params/localization_params.yaml" command="load"/>
+	</node>
+	-->
+	
+	<node pkg="indoor_localization" name="anchor_selection_node" type="anchor_selection_node.py" output="screen">
+		<rosparam file="$(find indoor_localization)/params/localization_params.yaml" command="load"/>
+	</node>
+
+	
+	<node pkg="indoor_localization" name="positioning_node" type="positioning_node.py" output="screen">
+		<rosparam file="$(find indoor_localization)/params/localization_params.yaml" command="load"/>
+	</node>
+
+	
+	<node pkg="indoor_localization" name="error_estimation_node" type="error_estimation_node.py" output="screen">
+		<rosparam file="$(find indoor_localization)/params/localization_params.yaml" command="load"/>
+	</node>
+
+
+	<!--
+	<node pkg="indoor_localization" name="initial_pos_generator" type="initial_pos_generator.py" output="screen">
+		<rosparam file="$(find indoor_localization)/params/localization_params.yaml" command="load"/>
+	</node>
+	-->
+
+	<!--
+	<node pkg="indoor_localization" name="kpi_calculation_node" type="kpi_calculation_node.py" output="screen">
+		<rosparam file="$(find indoor_localization)/params/localization_params.yaml" command="load"/>
+		<rosparam file="$(find indoor_localization)/params/region_params.yaml" command="load"/>
+	</node>
+	-->
+	
+	
+</launch>

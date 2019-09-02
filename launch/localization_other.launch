@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<launch>
+
+
+	<node pkg="indoor_localization" name="simulator" type="simulator.py" output="screen">
+		<rosparam file="$(find indoor_localization)/params/localization_params.yaml" command="load"/>
+	</node>
+	
+	<node pkg="indoor_localization" name="anchor_selection_node" type="anchor_selection_node.py" output="screen">
+		<rosparam file="$(find indoor_localization)/params/localization_params.yaml" command="load"/>
+	</node>
+
+	<node pkg="indoor_localization" name="positioning_node" type="positioning_node.py" output="screen">
+		<rosparam file="$(find indoor_localization)/params/localization_params.yaml" command="load"/>
+	</node>
+	
+
+</launch>
