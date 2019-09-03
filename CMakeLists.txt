@@ -16,8 +16,8 @@ find_package(catkin REQUIRED COMPONENTS
   rostest
   rosunit
   std_msgs
-  AnchorScan
 )
+
 
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
@@ -68,7 +68,6 @@ generate_messages(
   DEPENDENCIES
   geometry_msgs
   std_msgs
-  AnchorScan
 )
 
 ################################################
