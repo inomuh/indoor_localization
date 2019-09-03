@@ -16,6 +16,7 @@ find_package(catkin REQUIRED COMPONENTS
   rostest
   rosunit
   std_msgs
+  AnchorScan
 )
 
 ## System dependencies are found with CMake's conventions
