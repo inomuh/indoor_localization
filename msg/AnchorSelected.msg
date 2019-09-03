@@ -1,11 +1,10 @@
 # Timestamp
 Header header
 
-int32[] AnchorID
+int32[] AnchorID 
 
 float64[] x
 float64[] y
 float64[] z
 
-# according to "S anchor"
 float64[] tdoa_of_anchors

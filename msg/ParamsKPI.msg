@@ -1,0 +1,1 @@
+string current_region
