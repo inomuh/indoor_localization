@@ -8,13 +8,15 @@ project(indoor_localization)
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
+  geometry_msgs
   message_generation
   roscpp
   rospy
-  std_msgs
+  roslint
   rostest
+  rosunit
+  std_msgs
 )
-
 
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
@@ -23,7 +25,7 @@ find_package(catkin REQUIRED COMPONENTS
 ## Uncomment this if the package has a setup.py. This macro ensures
 ## modules and global scripts declared therein get installed
 ## See http://ros.org/doc/api/catkin/html/user_guide/setup_dot_py.html
- catkin_python_setup()
+catkin_python_setup()
 
 ################################################
 ## Declare ROS messages, services and actions ##
@@ -50,31 +52,23 @@ find_package(catkin REQUIRED COMPONENTS
 ##   * add every package in MSG_DEP_SET to generate_messages(DEPENDENCIES ...)
 
 ## Generate messages in the 'msg' folder
- add_message_files(
-   FILES
-   AnchorScan.msg
-#   Message2.msg
- )
+add_message_files(
+  FILES
+  AnchorScan.msg
+  AnchorSelected.msg
+  PositionInfo.msg
+  ErrorEstimated.msg
+  ParamsKPI.msg
+)
 
-## Generate services in the 'srv' folder
-# add_service_files(
-#   FILES
-#   Service1.srv
-#   Service2.srv
-# )
-
-## Generate actions in the 'action' folder
-# add_action_files(
-#   FILES
-#   Action1.action
-#   Action2.action
-# )
 
 ## Generate added messages and services with any dependencies listed here
- generate_messages(
-   DEPENDENCIES
-#   std_msgs
- )
+generate_messages(
+  DEPENDENCIES
+  geometry_msgs
+  std_msgs
+  AnchorScan
+)
 
 ################################################
 ## Declare ROS dynamic reconfigure parameters ##
@@ -102,16 +96,23 @@ find_package(catkin REQUIRED COMPONENTS
 ## The catkin_package macro generates cmake config files for your package
 ## Declare things to be passed to dependent projects
 ## INCLUDE_DIRS: uncomment this if your package contains header files
-## LIBRARIES: libraries you create in this project that dependent projects also need
+## LIBRARIES: libraries you create in this project that dependent projects also
+## need
 ## CATKIN_DEPENDS: catkin_packages dependent projects also need
-## DEPENDS: system dependencies of this project that dependent projects also need
+## DEPENDS: system dependencies of this project that dependent projects also
+## need
 catkin_package(
-#  INCLUDE_DIRS include
-#  LIBRARIES indoor_localization
-#  CATKIN_DEPENDS message_generation roscpp rospy std_msgs
-#  DEPENDS system_lib
-   CATKIN_DEPENDS message_runtime
+# INCLUDE_DIRS include
+  LIBRARIES indoor_localization
+  CATKIN_DEPENDS geometry_msgs message_generation roscpp rospy rostest
+  DEPENDS system_lib
 )
+
+# roslint_python(src/indoor_localization/anchor_selection_node.py)
+# roslint_python(src/indoor_localization/positioning_node.py)
+# roslint_python(src/indoor_localization/error_estimation_node.py)
+roslint_python(src/indoor_localization/kpi_calculation_node.py)
+
 
 ###########
 ## Build ##
@@ -119,35 +120,13 @@ catkin_package(
 
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
-include_directories(
-# include
-  ${catkin_INCLUDE_DIRS}
-)
+include_directories(include ${catkin_INCLUDE_DIRS})
 
 ## Declare a C++ library
 # add_library(${PROJECT_NAME}
 #   src/${PROJECT_NAME}/indoor_localization.cpp
 # )
 
-## Add cmake target dependencies of the library
-## as an example, code may need to be generated before libraries
-## either from message generation or dynamic reconfigure
-# add_dependencies(${PROJECT_NAME} ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-
-## Declare a C++ executable
-## With catkin_make all packages are built within a single CMake context
-## The recommended prefix ensures that target names across packages don't collide
-# add_executable(${PROJECT_NAME}_node src/indoor_localization_node.cpp)
-
-## Rename C++ executable without prefix
-## The above recommended prefix causes long target names, the following renames the
-## target back to the shorter version for ease of user use
-## e.g. "rosrun someones_pkg node" instead of "rosrun someones_pkg someones_pkg_node"
-# set_target_properties(${PROJECT_NAME}_node PROPERTIES OUTPUT_NAME node PREFIX "")
-
-## Add cmake target dependencies of the executable
-## same as for the library above
-# add_dependencies(${PROJECT_NAME}_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 ## Specify libraries to link a library or executable target against
 # target_link_libraries(${PROJECT_NAME}_node
@@ -163,10 +142,15 @@ include_directories(
 
 ## Mark executable scripts (Python etc.) for installation
 ## in contrast to setup.py, you can choose the destination
- install(PROGRAMS
-   src/indoor_localization/localization_node.py
+install(PROGRAMS
+   src/indoor_localization/positioning_node.py
    DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
  )
+
+foreach(dir launch msg params src test)
+    install(DIRECTORY ${dir}/
+        DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/${dir})
+endforeach()
 
 ## Mark executables and/or libraries for installation
 # install(TARGETS ${PROJECT_NAME} ${PROJECT_NAME}_node
@@ -192,16 +176,14 @@ include_directories(
 #############
 ## Testing ##
 #############
-catkin_add_nosetests(test/localization_node_test.py)
+
 ## Add gtest based cpp test target and link libraries
 # catkin_add_gtest(${PROJECT_NAME}-test test/test_indoor_localization.cpp)
 # if(TARGET ${PROJECT_NAME}-test)
 #   target_link_libraries(${PROJECT_NAME}-test ${PROJECT_NAME})
 # endif()
-####################################################################
-#   catkin_add_gtest(localization_node_test test/localization_node_test.cpp)
-#   target_link_libraries(localization_node_test indoor_localization)
-#   target_link_libraries(localization_node_test ${catkin_LIBRARIES})
-######################################################################
+
 ## Add folders to be run by python nosetests
-# catkin_add_nosetests(test)
+# catkin_add_nosetests(test/anchor_selection_node_test.py)
+# catkin_add_nosetests(test/positioning_node_test.py)
+catkin_add_nosetests(test/error_estimation_node_test.py)
