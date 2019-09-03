@@ -9,10 +9,13 @@
   <!-- <maintainer email="jane.doe@example.com">Jane Doe</maintainer> -->
   <maintainer email="elcin.erdogan@inovasyonmuhendislik.com">Elcin Erdogan</maintainer>
 
+<<<<<<< HEAD
 
   <!-- One license tag required, multiple allowed, one license per tag -->
   <!-- Commonly used license strings: -->
   <!--   BSD, MIT, Boost Software License, GPLv2, GPLv3, LGPLv2.1, LGPLv3 -->
+=======
+>>>>>>> 9875bd939dfba318a0b8a2e7a489b8c96cf49932
   <license>Apache 2.0</license>
 
 
