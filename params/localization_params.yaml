@@ -5,14 +5,24 @@
 #       3 =  Localization in 3D environment
 localization_mode: 2
 
+
 # see eq.(14) in document "Annex_IV_Accuracy Analysis"
 # standard deviation of TDOA measurement
 sig_c: 0.0625
+
 
 ## Upright axes
 # If mode selected as 2D, upright axes(TZ) will be unchangeable.
 #
 TZ: 1.10
+
+
+## Threshold Value 
+# This value indicates the maximum distance between two positions
+# (pre- and next-position). If the distance between positions is 
+# less than the threshold value, it means the tag does not move or vice versa.
+# [If the tag is moving in 2D environment, change this value rationally.]
+thr: 0.0001
 
 
 # KPI Period in seconds and nanoseconds
