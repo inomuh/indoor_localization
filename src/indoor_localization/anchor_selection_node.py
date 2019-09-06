@@ -55,8 +55,8 @@ def get_initial_position():
     Type  : list
     """
 
-    initial_tx = float(rospy.get_param("/anchor_selection_node/initial_Tx"))        # float(160 * (np.random.rand()))
-    initial_ty = float(rospy.get_param("/anchor_selection_node/initial_Ty"))        # float(160 * (np.random.rand()))
+    initial_tx = float(rospy.get_param("/anchor_selection_node/initial_Tx"))
+    initial_ty = float(rospy.get_param("/anchor_selection_node/initial_Ty"))
     initial_tz = float(rospy.get_param("/anchor_selection_node/TZ"))
     initial_position = list([initial_tx, initial_ty, initial_tz])
 
@@ -96,7 +96,7 @@ def callback_ips(cb_all_anch):
 
 
 # ----------------------------
-def ind_of_tag(position_list):        # posiiton'dan last position gelmeli
+def ind_of_tag(position_list):          # position information must be last position
     """
     Return: tag_index
     Type  : array
@@ -107,9 +107,9 @@ def ind_of_tag(position_list):        # posiiton'dan last position gelmeli
     return tag_index
 
 
-def ind_of_anch(tmp_ips_dict, row):       # IPS
+def ind_of_anch(tmp_ips_dict, row):     # IPS
     """
-    Ankorlarin bilgilerini alir
+    Takes information of anchors.
     Return: anchor_index
     Type  : array
     """
@@ -216,7 +216,7 @@ def anch_combination(row):
     for i in range(row):
         anchor_count[i] = i
 
-    # ID'lerin 3lu kombinasyonunu al
+    # Get the triple combination of IDs.
     comb_anch_list = list(combinations(anchor_count, 3))
     comb_anch = np.array(comb_anch_list)
 
@@ -236,18 +236,18 @@ def tmp_anch_combination(row, comb_anch, selected_anchors):
 
     i = 0
     while i < len(comb_anch):
-        for r in range(row):
-            if int(selected_anchors[r, 4]) == comb_anch[i, 0]:
+        for j in range(row):
+            if int(selected_anchors[j, 4]) == comb_anch[i, 0]:
                 comb_anch_tmp[i, :3] = comb_anch[i, :]
-                comb_anch_tmp[i, 4:7] = selected_anchors[r, :3]
+                comb_anch_tmp[i, 4:7] = selected_anchors[j, :3]
 
-            elif selected_anchors[r][4] == comb_anch[i][1]:
+            elif selected_anchors[j][4] == comb_anch[i][1]:
                 comb_anch_tmp[i, :3] = comb_anch[i, :]
-                comb_anch_tmp[i, 7:10] = selected_anchors[r, :3]
+                comb_anch_tmp[i, 7:10] = selected_anchors[j, :3]
 
-            elif selected_anchors[r][4] == comb_anch[i][2]:
+            elif selected_anchors[j][4] == comb_anch[i][2]:
                 comb_anch_tmp[i, :3] = comb_anch[i, :]
-                comb_anch_tmp[i, 10:13] = selected_anchors[r, :3]
+                comb_anch_tmp[i, 10:13] = selected_anchors[j, :3]
         i = i + 1
 
     return comb_anch_tmp
@@ -382,29 +382,29 @@ def generate_selected_tdoa(selected_anchors_dict, mode, tag_index):
         if i != min_ind and not a_control:      # == False:
             tmp_a = np.array(selected_coords[i])
             radius_a = LA.norm(tmp_t-tmp_a)
-            das = radius_a-radius_s
+            das = radius_a - radius_s
             tdoa_list.append(das)
             a_control = True
 
         elif i != min_ind and not b_control:        # == False:
             tmp_b = np.array(selected_coords[i])
-            radius_b = LA.norm(tmp_t-tmp_b)
-            dbs = radius_b-radius_s
+            radius_b = LA.norm(tmp_t - tmp_b)
+            dbs = radius_b - radius_s
             tdoa_list.append(dbs)
             b_control = True
 
         elif i != min_ind and not c_control:        # == False:
             tmp_c = np.array(selected_coords[i])
-            radius_c = LA.norm(tmp_t-tmp_c)
-            dcs = radius_c-radius_s
+            radius_c = LA.norm(tmp_t - tmp_c)
+            dcs = radius_c - radius_s
             tdoa_list.append(dcs)
             c_control = True
 
     return tdoa_list
 
 
-def find_sel_anch_index(tmp_ips_dict, selected_anchors_dict, mode):
-    """ IPS'ten gelen ankorlar içinden seçilen ankorların indexini bul. """
+def find_sel_anch_index(tmp_ips_dict, selected_anchors_dict):
+    """ Find the index of the selected anchors' indexes from the anchors which comes from IPS. """
 
     all_anchor_id = list(tmp_ips_dict['AnchorID'])
     selected_anchor_id = list(selected_anchors_dict.keys())
@@ -420,7 +420,7 @@ def find_sel_anch_index(tmp_ips_dict, selected_anchors_dict, mode):
 
 
 def subtract_one_from_each_index(sel_anch_index_list):
-    """ Seçilen ankorların index değerlerinden 1 çıkar. """
+    """ Subtract one from the selected anchors' index values. """
 
     new_index_list = list()
 
@@ -439,23 +439,22 @@ def subtract_one_from_each_index(sel_anch_index_list):
 
 def find_the_ddoa_values(tmp_ips_dict, new_index_list):
     """
-    IPS içindeki tdoa değerleri içinden yeni indexe denk gelen tdoa
-    değerlerini bul.
+    Find the tdoa values from the tdoa values in the IPS that
+    correspond to the new index.
     """
 
     all_tdoa = list(tmp_ips_dict['tdoa_of_anchors'])
     sel_anch_tdoa_list = list()
-    for i in range(len(new_index_list)):
-        ind = new_index_list[i]
-        sel_anch_tdoa_list.append(all_tdoa[ind])
+    for index in new_index_list:
+        sel_anch_tdoa_list.append(all_tdoa[index])
 
     return sel_anch_tdoa_list
 
 
 def detect_finalised_tdoa_values(min_ind, sel_anch_tdoa_list):
     """
-    Seçilen tdoa değerlerindeki minimum indexte yer alanını diğer tdoa
-    değerlerinden çıkar.
+    Subtract the minimum indexed selected tdoa values from the
+    other tdoa values.
     """
 
     final_tdoa_list = list()
@@ -473,7 +472,7 @@ def detect_finalised_tdoa_values(min_ind, sel_anch_tdoa_list):
 # ----------------------------
 
 
-def select_anchors_except_2D(tmp_ips_dict, mode):
+def select_anchors_except_2d(tmp_ips_dict, mode):
 
     selected_id = list()
     selected_anchors_dict = dict()
@@ -483,7 +482,8 @@ def select_anchors_except_2D(tmp_ips_dict, mode):
     y_list = list(tmp_ips_dict['y'])
     z_list = list(tmp_ips_dict['z'])
 
-    for j in range(mode + 1):     # Sinyali gelen butun ankorlarin ilk mode+1 kadarini al
+    for j in range(mode + 1):
+        # Receive the first (mode + 1) of all signal received anchors.
         selected_id.append(anchor_id_list[j])
 
         selected_coords = list()
@@ -497,69 +497,14 @@ def select_anchors_except_2D(tmp_ips_dict, mode):
     return selected_anchors_dict
 
 
-def generate_selected_tdoa(position_list, selected_anchors_dict, mode):#(ips_dict):
-
-    tmp_T = position_list
-
-    tdoa_list = list()
-
-    selected_ID = list(selected_anchors_dict.keys())
-    selected_coords = list(selected_anchors_dict.values())
-
-    min_ind = selected_ID.index(min(selected_ID))
-
-    tmp_S = np.array(selected_coords[min_ind])
-    rs = LA.norm(tmp_T-tmp_S)
-    # print("\nrs: " + str(rs))
-
-    if mode == 1:
-        A_control = False
-
-    elif mode == 3:
-        A_control = False
-        B_control = False
-        C_control = False
-
-    for i in range(len(selected_ID)):
-        if i != min_ind and not A_control:      # == False:
-            tmp_A = np.array(selected_coords[i])
-            ra = LA.norm(tmp_T-tmp_A)
-            # print("\nra: " + str(ra))
-            das = ra-rs
-            # print("\ndas: " + str(das))
-            tdoa_list.append(das)
-            A_control = True
-
-        elif i != min_ind and not B_control:        # == False:
-            tmp_B = np.array(selected_coords[i])
-            rb = LA.norm(tmp_T-tmp_B)
-            # print("\nrb: " + str(rb))
-            dbs = rb-rs
-            # print("\ndbs: " + str(dbs))
-            tdoa_list.append(dbs)
-            B_control = True
-
-        elif i != min_ind and not C_control:        # == False:
-            tmp_C = np.array(selected_coords[i])
-            rc = LA.norm(tmp_T-tmp_C)
-            # print("\nrc: " + str(rc))
-            dcs = rc-rs
-            # print("\ndcs: " + str(dcs))
-            tdoa_list.append(dcs)
-            C_control = True
-    
-    #print("\n\ntmp_selected_anchors_dict: " + str(selected_anchors_dict))
-    #print("\n\ntdoa_list: " + str(tdoa_list))
-
-    return tdoa_list
 # ----------------------------
 
 
 def anchor_pub_sub():
 
     rospy.init_node('anchor_selection_node', anonymous=True)
-    sub_ips = rospy.Subscriber('IPS', AnchorScan, callback_ips)
-    sub_last_pos = rospy.Subscriber('position', PositionInfo, callback_last_pos)
+    rospy.Subscriber('IPS', AnchorScan, callback_ips)
+    rospy.Subscriber('position', PositionInfo, callback_last_pos)
     pub = rospy.Publisher('selected_anchors', AnchorSelected, queue_size=2)
 
     rate = rospy.Rate(25)
@@ -579,8 +524,9 @@ def anchor_pub_sub():
                 position_list = initial_position
 
             if mode == 1 or mode == 3:
-                selected_anchors_dict = select_anchors_except_2D(IPS_DICT, mode)
-                selected_tdoa = generate_selected_tdoa(position_list, selected_anchors_dict, mode)
+                tag_index = ind_of_tag(position_list)
+                selected_anchors_dict = select_anchors_except_2d(IPS_DICT, mode)
+                selected_tdoa = generate_selected_tdoa(selected_anchors_dict, mode, tag_index)
                 # print(IPS_DICT)
                 # print(selected_anchors_dict.keys())
                 # print(selected_anchors_dict.values())
@@ -604,18 +550,17 @@ def anchor_pub_sub():
                 #     tag_index
                 # )
 
-                """ BURADAN BASLIYOR """
+                """ STARTS FROM HERE """
 
                 all_anc_ips_id = list(IPS_DICT['AnchorID'])
                 selected_anc_id = list(selected_anchors_dict.keys())
 
-                sel_anch_index_list = find_sel_anch_index(IPS_DICT, selected_anchors_dict, mode)
+                sel_anch_index_list = find_sel_anch_index(IPS_DICT, selected_anchors_dict)
 
-                # Eğer min(IPS.ID), list(selected_anchors.ID) listesinin içinde
-                # yer alıyorsa:
+                # If min(IPS.ID) is in the list(selected_anchors.ID):
                 if min(all_anc_ips_id) in selected_anc_id:
 
-                    # Eğer min(IPS.ID), list(IPS.ID) listesinin başında ise:
+                    # If min(IPS.ID) is at the top of the list(IPS.ID):
                     if all_anc_ips_id.index(min(all_anc_ips_id)) == 0:
                         min_id_ind_in_sel_anch = sel_anch_index_list.index(min(sel_anch_index_list))
                         sel_anch_index_list.pop(min_id_ind_in_sel_anch)
@@ -623,7 +568,7 @@ def anchor_pub_sub():
                         sel_anch_tdoa_list = find_the_ddoa_values(IPS_DICT, new_index_list)
                         selected_tdoa = sel_anch_tdoa_list
 
-                    # Eğer min(IPS.ID), list(IPS.ID) listesinin sonunda ise:
+                    # If min(IPS.ID) is at the end of the list(IPS.ID):
                     elif all_anc_ips_id.index(min(all_anc_ips_id)) == row - 1:
                         max_id_ind_in_sel_anch = sel_anch_index_list.index(max(sel_anch_index_list))
                         sel_anch_index_list.pop(max_id_ind_in_sel_anch)
@@ -631,46 +576,46 @@ def anchor_pub_sub():
                         sel_anch_tdoa_list = find_the_ddoa_values(IPS_DICT, new_index_list)
                         selected_tdoa = sel_anch_tdoa_list
 
-                    # Eğer min(IPS.ID), list(IPS.ID) listesinin ne başında ne de
-                    # sonunda ise:
+                    # If min(IPS.ID) is neither at the beginning nor end of the list(IPS.ID):
                     else:
                         new_index_list = list()
                         min_id_ind = all_anc_ips_id.index(min(all_anc_ips_id))
                         tmp_ind = sel_anch_index_list.index(min_id_ind)
                         sel_anch_index_list.pop(tmp_ind)
-                        for i in range(len(sel_anch_index_list)):
-                            if sel_anch_index_list[i] < min_id_ind:
-                                new_index_list.append(sel_anch_index_list[i])
+
+                        for item in sel_anch_index_list:
+                            if item < min_id_ind:
+                                new_index_list.append(item)
                             else:
-                                new_index_list.append(sel_anch_index_list[i] - 1)
+                                new_index_list.append(item - 1)
+
                         sel_anch_tdoa_list = find_the_ddoa_values(IPS_DICT, new_index_list)
                         selected_tdoa = sel_anch_tdoa_list
 
-                # Eğer min(IPS.ID), list(selected_anchors.ID) listesinin içinde
-                # yer almıyorsa:
+                # If min(IPS.ID) is not in the list(selected_anchors.ID):
                 else:
 
-                    # Eğer min(IPS.ID), list(IPS.ID) listesinin başında ise:
+                    # If min(IPS.ID) is at the top of the list(IPS.ID):
                     if all_anc_ips_id.index(min(all_anc_ips_id)) == 0:
                         new_index_list, min_ind = subtract_one_from_each_index(sel_anch_index_list)
                         sel_anch_tdoa_list = find_the_ddoa_values(IPS_DICT, new_index_list)
                         selected_tdoa = detect_finalised_tdoa_values(min_ind, sel_anch_tdoa_list)
 
-                    # Eğer min(IPS.ID), list(IPS.ID) listesinin sonunda ise:
+                    # If min(IPS.ID) is at the end of the list(IPS.ID):
                     elif all_anc_ips_id.index(min(all_anc_ips_id)) == row - 1:
                         sel_anch_tdoa_list = find_the_ddoa_values(IPS_DICT, sel_anch_index_list)
                         selected_tdoa = detect_finalised_tdoa_values(min_ind, sel_anch_tdoa_list)
 
-                    # Eğer min(IPS.ID), list(IPS.ID) listesinin ne başında ne de
-                    # sonunda ise:
+                    # If min(IPS.ID) is neither at the beginning nor end of the list(IPS.ID):
                     else:
                         new_index_list = list()
                         min_id_ind = all_anc_ips_id.index(min(all_anc_ips_id))
-                        for i in range(len(sel_anch_index_list)):
-                            if sel_anch_index_list[i] < min_id_ind:
-                                new_index_list.append(sel_anch_index_list[i])
+
+                        for item in sel_anch_index_list:
+                            if item < min_id_ind:
+                                new_index_list.append(item)
                             else:
-                                new_index_list.append(sel_anch_index_list[i] - 1)
+                                new_index_list.append(item - 1)
 
                         sel_anch_tdoa_list = find_the_ddoa_values(IPS_DICT, new_index_list)
                         selected_tdoa = detect_finalised_tdoa_values(min_ind, sel_anch_tdoa_list)
