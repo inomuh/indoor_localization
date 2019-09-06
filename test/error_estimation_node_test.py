@@ -3,6 +3,9 @@
 import unittest
 import math
 import indoor_localization.error_estimation_node as en
+from indoor_localization.msg import AnchorSelected
+from indoor_localization.msg import PositionInfo
+from indoor_localization.msg import ErrorEstimated
 
 PKG = 'indoor_localization'
 NAME = 'error_estimation_node_test'
@@ -42,10 +45,10 @@ class TestErrorEstimationNode(unittest.TestCase):
         anch_b = [0.92, 0.16, 1.21]
         anch_s = [8.3, 4.085, 1.945]
 
-        test_edilen = en.calc_accuracy(self.position_0, anch_a, anch_b, anch_s, self.sig_c)
-        test_sonuc = 0.1368576
+        tested = en.calc_accuracy(self.position_0, anch_a, anch_b, anch_s, self.sig_c)
+        test_result = 0.1368576
 
-        self.assertAlmostEqual(test_edilen, test_sonuc, 2)
+        self.assertAlmostEqual(tested, test_result, 2)
 
 
     def test1_calc_accuracy(self):
@@ -54,10 +57,10 @@ class TestErrorEstimationNode(unittest.TestCase):
         anch_b = [0.92, 0.16, 1.21]
         anch_s = [8.3, 4.085, 1.945]
 
-        test_edilen = en.calc_accuracy(self.position_1, anch_a, anch_b, anch_s, self.sig_c)
-        test_sonuc = 0.1076753
+        tested = en.calc_accuracy(self.position_1, anch_a, anch_b, anch_s, self.sig_c)
+        test_result = 0.1076753
 
-        self.assertAlmostEqual(test_edilen, test_sonuc, 2)
+        self.assertAlmostEqual(tested, test_result, 2)
 
 if __name__ == '__main__':
 	
