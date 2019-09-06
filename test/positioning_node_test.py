@@ -3,6 +3,8 @@
 import unittest
 import math
 import indoor_localization.positioning_node as pn
+from indoor_localization.msg import AnchorSelected
+from indoor_localization.msg import PositionInfo
 
 PKG = 'indoor_localization'
 NAME = 'positioning_node_test'
@@ -68,45 +70,50 @@ class TestPositioningNode(unittest.TestCase):
 	}
 
 # ----------------------------
+	"""
+	def test_localization_mode(self):
 
+		tested = pn.localization_mode()
+		self.assertTrue(self.assertEqual(tested, 1) or self.assertEqual(tested, 2) or self.assertEqual(tested, 3))
+	"""
 	def test0_find_min_id_ind(self):	# 2D
 
-		test_edilen = pn.find_min_id_ind(self.sel_anch_dict_0)
-		test_sonuc = int(0)
+		tested = find_min_id_ind(self.sel_anch_dict_0)
+		test_result = int(0)
 
-		self.assertEqual(test_edilen, test_sonuc)
+		self.assertEqual(tested, test_result)
 	
 
 	def test1_find_min_id_ind(self):	# 2D
 
-		test_edilen = pn.find_min_id_ind(self.sel_anch_dict_1)
-		test_sonuc = int(1)
+		tested = pn.find_min_id_ind(self.sel_anch_dict_1)
+		test_result = int(1)
 
-		self.assertEqual(test_edilen, test_sonuc)
+		self.assertEqual(tested, test_result)
 
 
 	def test2_find_min_id_ind(self):	# 1D
 
-		test_edilen = pn.find_min_id_ind(self.sel_anch_dict_2)
-		test_sonuc = int(0)
+		tested = pn.find_min_id_ind(self.sel_anch_dict_2)
+		test_result = int(0)
 
-		self.assertEqual(test_edilen, test_sonuc)
+		self.assertEqual(tested, test_result)
 
 
 	def test4_find_min_id_ind(self):	# 3D
 
-		test_edilen = pn.find_min_id_ind(self.sel_anch_dict_4)
-		test_sonuc = int(1)
+		tested = pn.find_min_id_ind(self.sel_anch_dict_4)
+		test_result = int(1)
 
-		self.assertEqual(test_edilen, test_sonuc)
+		self.assertEqual(tested, test_result)
 
 
 	def test5_find_min_id_ind(self):	# 3D
 
-		test_edilen = pn.find_min_id_ind(self.sel_anch_dict_5)
-		test_sonuc = int(3)
+		tested = pn.find_min_id_ind(self.sel_anch_dict_5)
+		test_result = int(3)
 
-		self.assertEqual(test_edilen, test_sonuc)
+		self.assertEqual(tested, test_result)
 
 # ----------------------------
 
@@ -117,10 +124,10 @@ class TestPositioningNode(unittest.TestCase):
 		selected_y = list(self.sel_anch_dict_0['y'])
 		selected_z = list(self.sel_anch_dict_0['z'])
 
-		test_edilen = pn.find_anchor_s(self.sel_anch_dict_0, min_id_ind, selected_x, selected_y, selected_z)
-		test_sonuc = list([8.3, 4.085, 1.945])
+		tested = pn.find_anchor_s(min_id_ind, selected_x, selected_y, selected_z)
+		test_result = list([8.3, 4.085, 1.945])
 
-		self.assertListEqual(test_edilen, test_sonuc)
+		self.assertListEqual(tested, test_result)
 
 	def test1_find_anchor_s(self):		# 2D
 
@@ -129,10 +136,10 @@ class TestPositioningNode(unittest.TestCase):
 		selected_y = list(self.sel_anch_dict_1['y'])
 		selected_z = list(self.sel_anch_dict_1['z'])
 
-		test_edilen = pn.find_anchor_s(self.sel_anch_dict_1, min_id_ind, selected_x, selected_y, selected_z)
-		test_sonuc = list([8.3, 4.085, 1.945])
+		tested = pn.find_anchor_s(min_id_ind, selected_x, selected_y, selected_z)
+		test_result = list([8.3, 4.085, 1.945])
 
-		self.assertListEqual(test_edilen, test_sonuc)
+		self.assertListEqual(tested, test_result)
 
 
 	def test2_find_anchor_s(self):		# 1D
@@ -142,10 +149,10 @@ class TestPositioningNode(unittest.TestCase):
 		selected_y = list(self.sel_anch_dict_2['y'])
 		selected_z = list(self.sel_anch_dict_2['z'])
 
-		test_edilen = pn.find_anchor_s(self.sel_anch_dict_2, min_id_ind, selected_x, selected_y, selected_z)
-		test_sonuc = list([2.88, -1.69, 1.28])
+		tested = pn.find_anchor_s(min_id_ind, selected_x, selected_y, selected_z)
+		test_result = list([2.88, -1.69, 1.28])
 
-		self.assertListEqual(test_edilen, test_sonuc)
+		self.assertListEqual(tested, test_result)
 
 
 	def test4_find_anchor_s(self):		# 3D
@@ -155,10 +162,10 @@ class TestPositioningNode(unittest.TestCase):
 		selected_y = list(self.sel_anch_dict_4['y'])
 		selected_z = list(self.sel_anch_dict_4['z'])
 
-		test_edilen = pn.find_anchor_s(self.sel_anch_dict_4, min_id_ind, selected_x, selected_y, selected_z)
-		test_sonuc = list([2.25, 3.15, 0.11])
+		tested = pn.find_anchor_s(min_id_ind, selected_x, selected_y, selected_z)
+		test_result = list([2.25, 3.15, 0.11])
 
-		self.assertListEqual(test_edilen, test_sonuc)
+		self.assertListEqual(tested, test_result)
 
 
 	def test5_find_anchor_s(self):		# 3D
@@ -168,10 +175,10 @@ class TestPositioningNode(unittest.TestCase):
 		selected_y = list(self.sel_anch_dict_5['y'])
 		selected_z = list(self.sel_anch_dict_5['z'])
 
-		test_edilen = pn.find_anchor_s(self.sel_anch_dict_5, min_id_ind, selected_x, selected_y, selected_z)
-		test_sonuc = list([2.25, 3.15, 0.11])
+		tested = pn.find_anchor_s(min_id_ind, selected_x, selected_y, selected_z)
+		test_result = list([2.25, 3.15, 0.11])
 
-		self.assertListEqual(test_edilen, test_sonuc)
+		self.assertListEqual(tested, test_result)
 
 # ----------------------------
 
@@ -182,10 +189,10 @@ class TestPositioningNode(unittest.TestCase):
 		selected_y = list(self.sel_anch_dict_0['y'])
 		selected_z = list(self.sel_anch_dict_0['z'])
 
-		test_edilen = pn.find_anchor_a(self.sel_anch_dict_0, min_id_ind, selected_x, selected_y, selected_z)
-		test_sonuc = [0.92, 0.16, 1.21], 2
+		tested = pn.find_anchor_a(self.sel_anch_dict_0, min_id_ind, selected_x, selected_y, selected_z)
+		test_result = [0.92, 0.16, 1.21], 2
 
-		self.assertEqual(test_edilen, test_sonuc)
+		self.assertEqual(tested, test_result)
 
 
 	def test1_find_anchor_a(self):		# 2D
@@ -195,10 +202,10 @@ class TestPositioningNode(unittest.TestCase):
 		selected_y = list(self.sel_anch_dict_1['y'])
 		selected_z = list(self.sel_anch_dict_1['z'])
 
-		test_edilen = pn.find_anchor_a(self.sel_anch_dict_1, min_id_ind, selected_x, selected_y, selected_z)
-		test_sonuc = [0.92, 0.16, 1.21], 2
+		tested = pn.find_anchor_a(self.sel_anch_dict_1, min_id_ind, selected_x, selected_y, selected_z)
+		test_result = [0.92, 0.16, 1.21], 2
 
-		self.assertEqual(test_edilen, test_sonuc)
+		self.assertEqual(tested, test_result)
 
 	
 	def test2_find_anchor_a(self):		# 1D
@@ -208,10 +215,10 @@ class TestPositioningNode(unittest.TestCase):
 		selected_y = list(self.sel_anch_dict_2['y'])
 		selected_z = list(self.sel_anch_dict_2['z'])
 
-		test_edilen = pn.find_anchor_a(self.sel_anch_dict_2, min_id_ind, selected_x, selected_y, selected_z)
-		test_sonuc = [5.4, 8.6, 1.28], 1
+		tested = pn.find_anchor_a(self.sel_anch_dict_2, min_id_ind, selected_x, selected_y, selected_z)
+		test_result = [5.4, 8.6, 1.28], 1
 
-		self.assertEqual(test_edilen, test_sonuc)
+		self.assertEqual(tested, test_result)
 
 
 	def test4_find_anchor_a(self):		# 3D
@@ -221,10 +228,10 @@ class TestPositioningNode(unittest.TestCase):
 		selected_y = list(self.sel_anch_dict_4['y'])
 		selected_z = list(self.sel_anch_dict_4['z'])
 
-		test_edilen = pn.find_anchor_a(self.sel_anch_dict_4, min_id_ind, selected_x, selected_y, selected_z)
-		test_sonuc = [4.21, 2.6, 2.84], 3
+		tested = pn.find_anchor_a(self.sel_anch_dict_4, min_id_ind, selected_x, selected_y, selected_z)
+		test_result = [4.21, 2.6, 2.84], 3
 
-		self.assertEqual(test_edilen, test_sonuc)
+		self.assertEqual(tested, test_result)
 
 
 	def test5_find_anchor_a(self):		# 3D
@@ -234,10 +241,10 @@ class TestPositioningNode(unittest.TestCase):
 		selected_y = list(self.sel_anch_dict_5['y'])
 		selected_z = list(self.sel_anch_dict_5['z'])
 
-		test_edilen = pn.find_anchor_a(self.sel_anch_dict_5, min_id_ind, selected_x, selected_y, selected_z)
-		test_sonuc = [4.21, 2.6, 2.84], 2
+		tested = pn.find_anchor_a(self.sel_anch_dict_5, min_id_ind, selected_x, selected_y, selected_z)
+		test_result = [4.21, 2.6, 2.84], 2
 
-		self.assertEqual(test_edilen, test_sonuc)
+		self.assertEqual(tested, test_result)
 
 # ----------------------------
 
@@ -249,10 +256,10 @@ class TestPositioningNode(unittest.TestCase):
 		selected_y = list(self.sel_anch_dict_0['y'])
 		selected_z = list(self.sel_anch_dict_0['z'])
 
-		test_edilen = pn.find_anchor_b(self.sel_anch_dict_0, min_id_ind, anch_a_ind, selected_x, selected_y, selected_z)
-		test_sonuc = [7.79, 0.96, 1.64], 1
+		tested = pn.find_anchor_b(self.sel_anch_dict_0, min_id_ind, anch_a_ind, selected_x, selected_y, selected_z)
+		test_result = [7.79, 0.96, 1.64], 1
 
-		self.assertEqual(test_edilen, test_sonuc)
+		self.assertEqual(tested, test_result)
 
 
 	def test1_find_anchor_b(self):		# 2D
@@ -263,10 +270,10 @@ class TestPositioningNode(unittest.TestCase):
 		selected_y = list(self.sel_anch_dict_1['y'])
 		selected_z = list(self.sel_anch_dict_1['z'])
 
-		test_edilen = pn.find_anchor_b(self.sel_anch_dict_1, min_id_ind, anch_a_ind, selected_x, selected_y, selected_z)
-		test_sonuc = [7.79, 0.96, 1.64], 0
+		tested = pn.find_anchor_b(self.sel_anch_dict_1, min_id_ind, anch_a_ind, selected_x, selected_y, selected_z)
+		test_result = [7.79, 0.96, 1.64], 0
 
-		self.assertEqual(test_edilen, test_sonuc)
+		self.assertEqual(tested, test_result)
 
 
 	def test4_find_anchor_b(self):		# 3D
@@ -277,10 +284,10 @@ class TestPositioningNode(unittest.TestCase):
 		selected_y = list(self.sel_anch_dict_4['y'])
 		selected_z = list(self.sel_anch_dict_4['z'])
 
-		test_edilen = pn.find_anchor_b(self.sel_anch_dict_4, min_id_ind, anch_a_ind, selected_x, selected_y, selected_z)
-		test_sonuc = [4.265, 0.45, 0.11], 2
+		tested = pn.find_anchor_b(self.sel_anch_dict_4, min_id_ind, anch_a_ind, selected_x, selected_y, selected_z)
+		test_result = [4.265, 0.45, 0.11], 2
 
-		self.assertEqual(test_edilen, test_sonuc)
+		self.assertEqual(tested, test_result)
 
 
 	def test5_find_anchor_b(self):		# 3D
@@ -291,10 +298,10 @@ class TestPositioningNode(unittest.TestCase):
 		selected_y = list(self.sel_anch_dict_5['y'])
 		selected_z = list(self.sel_anch_dict_5['z'])
 
-		test_edilen = pn.find_anchor_b(self.sel_anch_dict_5, min_id_ind, anch_a_ind, selected_x, selected_y, selected_z)
-		test_sonuc = [4.265, 0.45, 0.11], 1
+		tested = pn.find_anchor_b(self.sel_anch_dict_5, min_id_ind, anch_a_ind, selected_x, selected_y, selected_z)
+		test_result = [4.265, 0.45, 0.11], 1
 
-		self.assertEqual(test_edilen, test_sonuc)
+		self.assertEqual(tested, test_result)
 
 # ----------------------------
 
@@ -307,10 +314,10 @@ class TestPositioningNode(unittest.TestCase):
 		selected_y = list(self.sel_anch_dict_4['y'])
 		selected_z = list(self.sel_anch_dict_4['z'])
 
-		test_edilen = pn.find_anchor_c(self.sel_anch_dict_4, min_id_ind, anch_a_ind, anch_b_ind, selected_x, selected_y, selected_z)
-		test_sonuc = [1.84, 0.835, 2.84]
+		tested = pn.find_anchor_c(self.sel_anch_dict_4, min_id_ind, anch_a_ind, anch_b_ind, selected_x, selected_y, selected_z)
+		test_result = [1.84, 0.835, 2.84]
 
-		self.assertEqual(test_edilen, test_sonuc)
+		self.assertEqual(tested, test_result)
 	
 	def test5_find_anchor_c(self):		# 3D
 
@@ -321,10 +328,10 @@ class TestPositioningNode(unittest.TestCase):
 		selected_y = list(self.sel_anch_dict_5['y'])
 		selected_z = list(self.sel_anch_dict_5['z'])
 
-		test_edilen = pn.find_anchor_c(self.sel_anch_dict_5, min_id_ind, anch_a_ind, anch_b_ind, selected_x, selected_y, selected_z)
-		test_sonuc = [1.84, 0.835, 2.84]
+		tested = pn.find_anchor_c(self.sel_anch_dict_5, min_id_ind, anch_a_ind, anch_b_ind, selected_x, selected_y, selected_z)
+		test_result = [1.84, 0.835, 2.84]
 
-		self.assertEqual(test_edilen, test_sonuc)
+		self.assertEqual(tested, test_result)
 
 # ----------------------------
 
@@ -336,11 +343,11 @@ class TestPositioningNode(unittest.TestCase):
 		dbs = -1.129004
 		das = -5.364140
 		tag_z = 1.72
-		test_edilen = pn.calc_pos_2d_3a_ite(anch_s, anch_a, anch_b, tag_z, das, dbs)
-		test_sonuc = [2.038855, 1.240696, 1.72]
-		self.assertAlmostEqual(test_edilen[0], test_sonuc[0], 4)
-		self.assertAlmostEqual(test_edilen[1], test_sonuc[1], 4)
-		self.assertAlmostEqual(test_edilen[2], test_sonuc[2], 4)
+		tested = pn.calc_pos_2d_3a_ite(anch_s, anch_a, anch_b, tag_z, das, dbs)
+		test_result = [2.038855, 1.240696, 1.72]
+		self.assertAlmostEqual(tested[0], test_result[0], 4)
+		self.assertAlmostEqual(tested[1], test_result[1], 4)
+		self.assertAlmostEqual(tested[2], test_result[2], 4)
 
 
 	def test1_calc_pos_2d_3a_ite(self):		# 2D
@@ -352,12 +359,12 @@ class TestPositioningNode(unittest.TestCase):
 		das = 1.094042
 		tag_z = 1.72
 
-		test_edilen = pn.calc_pos_2d_3a_ite(anch_s, anch_a, anch_b, tag_z, das, dbs)
-		test_sonuc = [4.94928, 2.635953, 1.72]
+		tested = pn.calc_pos_2d_3a_ite(anch_s, anch_a, anch_b, tag_z, das, dbs)
+		test_result = [4.94928, 2.635953, 1.72]
 
-		self.assertAlmostEqual(test_edilen[0], test_sonuc[0], 4)
-		self.assertAlmostEqual(test_edilen[1], test_sonuc[1], 4)
-		self.assertAlmostEqual(test_edilen[2], test_sonuc[2], 4)
+		self.assertAlmostEqual(tested[0], test_result[0], 4)
+		self.assertAlmostEqual(tested[1], test_result[1], 4)
+		self.assertAlmostEqual(tested[2], test_result[2], 4)
 
 	
 	def test2_calc_dist_1d_2a_ite(self):	# 1D
@@ -368,13 +375,13 @@ class TestPositioningNode(unittest.TestCase):
 		L1 = [3.36, 0.88, 0.84]
 		L2 = [3.36, 1.76, 0.84]
 
-		test_edilen = pn.calc_dist_1d_2a_ite(anch_s, anch_a, L1, L2, das)
-		test_sonuc = [3.36, 1.0635, 0.84, 0.1835423]
+		tested = pn.calc_dist_1d_2a_ite(anch_s, anch_a, L1, L2, das)
+		test_result = [3.36, 1.0635, 0.84, 0.1835423]
 
-		self.assertAlmostEqual(test_edilen[0], test_sonuc[0], 4)
-		self.assertAlmostEqual(test_edilen[1], test_sonuc[1], 4)
-		self.assertAlmostEqual(test_edilen[2], test_sonuc[2], 4)
-		self.assertAlmostEqual(test_edilen[3], test_sonuc[3], 4)
+		self.assertAlmostEqual(tested[0], test_result[0], 4)
+		self.assertAlmostEqual(tested[1], test_result[1], 4)
+		self.assertAlmostEqual(tested[2], test_result[2], 4)
+		self.assertAlmostEqual(tested[3], test_result[3], 4)
 
 
 	def test3_calc_dist_1d_2a_ite(self):	# 1D
@@ -385,13 +392,13 @@ class TestPositioningNode(unittest.TestCase):
 		L1 = [3.36, 0.88, 0.84]
 		L2 = [3.36, 1.76, 0.84]
 
-		test_edilen = pn.calc_dist_1d_2a_ite(anch_s, anch_a, L1, L2, das)
-		test_sonuc = [3.36, 1.1256026, 0.84, 0.2456027]
+		tested = pn.calc_dist_1d_2a_ite(anch_s, anch_a, L1, L2, das)
+		test_result = [3.36, 1.1256026, 0.84, 0.2456027]
 
-		self.assertAlmostEqual(test_edilen[0], test_sonuc[0], 4)
-		self.assertAlmostEqual(test_edilen[1], test_sonuc[1], 4)
-		self.assertAlmostEqual(test_edilen[2], test_sonuc[2], 4)
-		self.assertAlmostEqual(test_edilen[3], test_sonuc[3], 4)
+		self.assertAlmostEqual(tested[0], test_result[0], 4)
+		self.assertAlmostEqual(tested[1], test_result[1], 4)
+		self.assertAlmostEqual(tested[2], test_result[2], 4)
+		self.assertAlmostEqual(tested[3], test_result[3], 4)
 	
 
 	def test4_calc_pos_3d_4a_ite(self):		# 3D
@@ -404,12 +411,12 @@ class TestPositioningNode(unittest.TestCase):
 		dbs = -0.070313506
 		dcs = 0.75415739
 
-		test_edilen = pn.calc_pos_3d_4a_ite(anch_s, anch_a, anch_b, anch_c, das, dbs, dcs)
-		test_sonuc = [2.794704, 1.370288, 0.4022198]
+		tested = pn.calc_pos_3d_4a_ite(anch_s, anch_a, anch_b, anch_c, das, dbs, dcs)
+		test_result = [2.794704, 1.370288, 0.4022198]
 
-		self.assertAlmostEqual(test_edilen[0], test_sonuc[0], 4)
-		self.assertAlmostEqual(test_edilen[1], test_sonuc[1], 4)
-		self.assertAlmostEqual(test_edilen[2], test_sonuc[2], 4)
+		self.assertAlmostEqual(tested[0], test_result[0], 4)
+		self.assertAlmostEqual(tested[1], test_result[1], 4)
+		self.assertAlmostEqual(tested[2], test_result[2], 4)
 
 
 	def test5_calc_pos_3d_4a_ite(self):		# 3D
@@ -422,17 +429,16 @@ class TestPositioningNode(unittest.TestCase):
 		dbs = -1.1483716
 		dcs = 0.70016383
 
-		test_edilen = pn.calc_pos_3d_4a_ite(anch_s, anch_a, anch_b, anch_c, das, dbs, dcs)
-		test_sonuc = [3.574661, 1.303216, 0.4674477]
+		tested = pn.calc_pos_3d_4a_ite(anch_s, anch_a, anch_b, anch_c, das, dbs, dcs)
+		test_result = [3.574661, 1.303216, 0.4674477]
 
-		self.assertAlmostEqual(test_edilen[0], test_sonuc[0], 4)
-		self.assertAlmostEqual(test_edilen[1], test_sonuc[1], 4)
-		self.assertAlmostEqual(test_edilen[2], test_sonuc[2], 4)
+		self.assertAlmostEqual(tested[0], test_result[0], 4)
+		self.assertAlmostEqual(tested[1], test_result[1], 4)
+		self.assertAlmostEqual(tested[2], test_result[2], 4)
 
 
 if __name__ == '__main__':
 	
 	import rosunit
-	# rosunit.unitrun(PKG, NAME, TestPositioningNode, sysargs = "--coverage", coverage_packages=[str(PKG)])
-	rosunit.unitrun(PKG, NAME, TestPositioningNode, sysargs = None, coverage_packages = None)
-
+	rosunit.unitrun(PKG, NAME, TestPositioningNode, sysargs = "--cov", coverage_packages = ['indoor_localization', 'rospy', 'rosunit'])
+	# rosunit.unitrun(PKG, NAME, TestPositioningNode, sysargs = None, coverage_packages = [str(PKG)])
