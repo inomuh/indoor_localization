@@ -85,16 +85,16 @@ def callback_selected_anchors(cb_selected_anch):
 
 def add_noise(denominator):
     """
-    This function adds some noie to the denominator to prevent the ZeroDivisionError 
+    This function adds some noie to the denominator to prevent the ZeroDivisionError
     while calculating the pre_tag_z, the pre_tag_y and the pre_tag_x values.
     """
 
     if (denominator >= -0.01) and (denominator <= 0):
         denominator -= random.uniform(0, 0.1)
-    
+
     elif (denominator >= 0) and (denominator <= 0.01):
         denominator += random.uniform(0, 0.1)
-    
+
     return denominator
 
 
@@ -107,8 +107,7 @@ def find_min_id_ind(tmp_sel_anch_dict):
     return min_id_ind
 
 
-def find_anchor_s(tmp_sel_anch_dict,
-                  min_id_ind,
+def find_anchor_s(min_id_ind,
                   selected_x,
                   selected_y,
                   selected_z):
@@ -197,19 +196,19 @@ def calc_dist_1d_2a_ite(anch_s, anch_a,
     tag_y_new = float((line_end_y + line_start_y) / 2)
     tag_z_new = float((line_end_z + line_start_z) / 2)
 
-    N = float(
-        2*(anch_a_x-anch_s_x)*line_start_x +
-        2*(anch_a_y-anch_s_y)*line_start_y +
-        2*(anch_a_z-anch_s_z)*line_start_z +
-        (pow(anch_s_x, 2)+pow(anch_s_y, 2)+pow(anch_s_z, 2)) -
-        (pow(anch_a_x, 2)+pow(anch_a_y, 2)+pow(anch_a_z, 2)) +
+    val_n = float(
+        2*(anch_a_x - anch_s_x)*line_start_x +
+        2*(anch_a_y - anch_s_y)*line_start_y +
+        2*(anch_a_z - anch_s_z)*line_start_z +
+        (pow(anch_s_x, 2) + pow(anch_s_y, 2) + pow(anch_s_z, 2)) -
+        (pow(anch_a_x, 2) + pow(anch_a_y, 2) + pow(anch_a_z, 2)) +
         pow(dist_diff_a_s, 2)
         )
 
-    Q = float(
-        2*(anch_a_x-anch_s_x)*(line_end_x-line_start_x) +
-        2*(anch_a_y-anch_s_y)*(line_end_y-line_start_y) +
-        2*(anch_a_z-anch_s_z)*(line_end_z-line_start_z)
+    val_q = float(
+        2*(anch_a_x - anch_s_x)*(line_end_x - line_start_x) +
+        2*(anch_a_y - anch_s_y)*(line_end_y - line_start_y) +
+        2*(anch_a_z - anch_s_z)*(line_end_z - line_start_z)
         )
 
     iter_num = 0
@@ -225,31 +224,31 @@ def calc_dist_1d_2a_ite(anch_s, anch_a,
 
         radius_s = float(
             sqrt(
-                pow((anch_s_x-tag_x_old), 2) +
-                pow((anch_s_y-tag_y_old), 2) +
-                pow((anch_s_z-tag_z_old), 2)
+                pow((anch_s_x - tag_x_old), 2) +
+                pow((anch_s_y - tag_y_old), 2) +
+                pow((anch_s_z - tag_z_old), 2)
                 )
             )
 
-        m = float(-(N + (2*dist_diff_a_s*radius_s))/Q)
+        m = float(-(val_n + (2*dist_diff_a_s*radius_s))/val_q)
 
-        tag_x_new = float(line_start_x + m*(line_end_x-line_start_x))
-        tag_y_new = float(line_start_y + m*(line_end_y-line_start_y))
-        tag_z_new = float(line_start_z + m*(line_end_z-line_start_z))
+        tag_x_new = float(line_start_x + m*(line_end_x - line_start_x))
+        tag_y_new = float(line_start_y + m*(line_end_y - line_start_y))
+        tag_z_new = float(line_start_z + m*(line_end_z - line_start_z))
 
         diff = float(
             sqrt(
-                pow((tag_x_new-tag_x_old), 2) +
-                pow((tag_y_new-tag_y_old), 2) +
-                pow((tag_z_new-tag_z_old), 2)
+                pow((tag_x_new - tag_x_old), 2) +
+                pow((tag_y_new - tag_y_old), 2) +
+                pow((tag_z_new - tag_z_old), 2)
                 )
             )
 
     distance = float(
         sqrt(
-            pow((line_start_x-tag_x_new), 2) +
-            pow((line_start_y-tag_y_new), 2) +
-            pow((line_start_z-tag_z_new), 2)
+            pow((line_start_x - tag_x_new), 2) +
+            pow((line_start_y - tag_y_new), 2) +
+            pow((line_start_z - tag_z_new), 2)
             )
         )
 
@@ -300,9 +299,9 @@ def calc_pos_2d_3a_ite(anch_s, anch_a, anch_b,
         iter_num = iter_num + 1
 
         radius_s = sqrt(
-            pow((anch_s_x-tag_x), 2) +
-            pow((anch_s_y-tag_y), 2) +
-            pow((anch_s_z-tag_z), 2)
+            pow((anch_s_x - tag_x), 2) +
+            pow((anch_s_y - tag_y), 2) +
+            pow((anch_s_z - tag_z), 2)
             )
         radius_a = radius_s + dist_diff_a_s
         radius_b = radius_s + dist_diff_b_s
@@ -318,46 +317,46 @@ def calc_pos_2d_3a_ite(anch_s, anch_a, anch_b,
         #     pow((anch_b_z-tag_z), 2)
         #     )
 
-        M11 = 2.0 * (anch_s_x-anch_a_x)
-        M12 = 2.0 * (anch_s_y-anch_a_y)
-        M21 = 2.0 * (anch_s_x-anch_b_x)
-        M22 = 2.0 * (anch_s_y-anch_b_y)
+        m_11 = 2.0 * (anch_s_x - anch_a_x)
+        m_12 = 2.0 * (anch_s_y - anch_a_y)
+        m_21 = 2.0 * (anch_s_x - anch_b_x)
+        m_22 = 2.0 * (anch_s_y - anch_b_y)
 
-        N1 = float(
+        val_n_1 = float(
             pow(radius_a, 2) - pow(radius_s, 2) -
-            2*(tag_z-anch_s_z)*(anch_s_z-anch_a_z) -
-            pow((anch_s_x-anch_a_x), 2) -
-            pow((anch_s_y-anch_a_y), 2) -
-            pow((anch_s_z-anch_a_z), 2) +
-            2*anch_s_x*(anch_s_x-anch_a_x) + 2*anch_s_y*(anch_s_y-anch_a_y)
+            2*(tag_z - anch_s_z)*(anch_s_z - anch_a_z) -
+            pow((anch_s_x - anch_a_x), 2) -
+            pow((anch_s_y - anch_a_y), 2) -
+            pow((anch_s_z - anch_a_z), 2) +
+            2*anch_s_x*(anch_s_x - anch_a_x) + 2*anch_s_y*(anch_s_y - anch_a_y)
             )
 
-        N2 = float(
+        val_n_2 = float(
             pow(radius_b, 2) - pow(radius_s, 2) -
-            2*(tag_z-anch_s_z)*(anch_s_z-anch_b_z) -
-            pow((anch_s_x-anch_b_x), 2) -
-            pow((anch_s_y-anch_b_y), 2) -
-            pow((anch_s_z-anch_b_z), 2) +
-            2*anch_s_x*(anch_s_x-anch_b_x) + 2*anch_s_y*(anch_s_y-anch_b_y)
+            2*(tag_z - anch_s_z)*(anch_s_z - anch_b_z) -
+            pow((anch_s_x - anch_b_x), 2) -
+            pow((anch_s_y - anch_b_y), 2) -
+            pow((anch_s_z - anch_b_z), 2) +
+            2*anch_s_x*(anch_s_x - anch_b_x) + 2*anch_s_y*(anch_s_y - anch_b_y)
             )
 
-        if M11 == 0:
-        #     M11 = float(0.1)
-            M11 = add_noise(M11)
+        if m_11 == 0:
+        #     m_11 = float(0.1)
+            m_11 = add_noise(m_11)
 
         pre_tag_y = float(
-            (N2 - (M21*N1/M11))/(M22-(M21*M12/M11))
+            (val_n_2 - (m_21*val_n_1/m_11))/(m_22 - (m_21*m_12/m_11))
             )
 
-        if M21 == 0:
-        #     M21 = float(0.1)
-            M21 = add_noise(M21)
+        if m_21 == 0:
+        #     m_21 = float(0.1)
+            m_21 = add_noise(m_21)
 
         pre_tag_x = float(
-            ((-1*M21*N1/M11) + (M21*M12/M11)*pre_tag_y)/(-1*M21)
+            ((-1*m_21*val_n_1/m_11) + (m_21*m_12/m_11)*pre_tag_y)/(-1*m_21)
             )
 
-        if ((iter_num > 20) or (sqrt(pow((pre_tag_x - tag_x), 2) + pow((pre_tag_y-tag_y), 2)) < 0.05)):
+        if ((iter_num > 20) or (sqrt(pow((pre_tag_x - tag_x), 2) + pow((pre_tag_y - tag_y), 2)) < 0.05)):
             loop_run = 0
 
         tag_x = pre_tag_x
@@ -404,9 +403,9 @@ def calc_pos_3d_4a_ite(anch_s, anch_a, anch_b, anch_c,
     anch_c_y = anch_c[1]
     anch_c_z = anch_c[2]
 
-    tag_x = (anch_s_x+anch_a_x+anch_b_x+anch_c_x)/4.0
-    tag_y = (anch_s_y+anch_a_y+anch_b_y+anch_c_y)/4.0
-    tag_z = (anch_s_z+anch_a_z+anch_b_z+anch_c_z)/4.0
+    tag_x = (anch_s_x + anch_a_x + anch_b_x + anch_c_x)/4.0
+    tag_y = (anch_s_y + anch_a_y + anch_b_y + anch_c_y)/4.0
+    tag_z = (anch_s_z + anch_a_z + anch_b_z + anch_c_z)/4.0
 
     while loop_run == 1:
 
@@ -414,101 +413,82 @@ def calc_pos_3d_4a_ite(anch_s, anch_a, anch_b, anch_c,
 
         radius_s = float(
             sqrt(
-                pow((anch_s_x-tag_x), 2) +
-                pow((anch_s_y-tag_y), 2) +
-                pow((anch_s_z-tag_z), 2)
+                pow((anch_s_x - tag_x), 2) +
+                pow((anch_s_y - tag_y), 2) +
+                pow((anch_s_z - tag_z), 2)
                 )
             )
         radius_a = float(radius_s + dist_diff_a_s)
         radius_b = float(radius_s + dist_diff_b_s)
         radius_c = float(radius_s + dist_diff_c_s)
 
-        M11 = float(2.0*(anch_s_x-anch_a_x))
-        M12 = float(2.0*(anch_s_y-anch_a_y))
-        M13 = float(2.0*(anch_s_z-anch_a_z))
+        m_11 = float(2.0*(anch_s_x - anch_a_x))
+        m_12 = float(2.0*(anch_s_y - anch_a_y))
+        m_13 = float(2.0*(anch_s_z - anch_a_z))
 
-        M21 = float(2.0*(anch_s_x-anch_b_x))
-        M22 = float(2.0*(anch_s_y-anch_b_y))
-        M23 = float(2.0*(anch_s_z-anch_b_z))
+        m_21 = float(2.0*(anch_s_x - anch_b_x))
+        m_22 = float(2.0*(anch_s_y - anch_b_y))
+        m_23 = float(2.0*(anch_s_z - anch_b_z))
 
-        M31 = float(2.0*(anch_s_x-anch_c_x))
-        M32 = float(2.0*(anch_s_y-anch_c_y))
-        M33 = float(2.0*(anch_s_z-anch_c_z))
+        m_31 = float(2.0*(anch_s_x - anch_c_x))
+        m_32 = float(2.0*(anch_s_y - anch_c_y))
+        m_33 = float(2.0*(anch_s_z - anch_c_z))
 
-        N1 = float(
+        val_n_1 = float(
             pow(radius_a, 2) - pow(radius_s, 2) +
-            (pow(anch_s_x, 2)+pow(anch_s_y, 2)+pow(anch_s_z, 2)) -
-            (pow(anch_a_x, 2)+pow(anch_a_y, 2)+pow(anch_a_z, 2))
+            (pow(anch_s_x, 2) + pow(anch_s_y, 2) + pow(anch_s_z, 2)) -
+            (pow(anch_a_x, 2) + pow(anch_a_y, 2) + pow(anch_a_z, 2))
             )
 
-        N2 = float(
+        val_n_2 = float(
             pow(radius_b, 2) - pow(radius_s, 2) +
-            (pow(anch_s_x, 2)+pow(anch_s_y, 2)+pow(anch_s_z, 2)) -
-            (pow(anch_b_x, 2)+pow(anch_b_y, 2)+pow(anch_b_z, 2))
+            (pow(anch_s_x, 2) + pow(anch_s_y, 2) + pow(anch_s_z, 2)) -
+            (pow(anch_b_x, 2) + pow(anch_b_y, 2) + pow(anch_b_z, 2))
             )
 
-        N3 = float(
+        val_n_3 = float(
             pow(radius_c, 2) - pow(radius_s, 2) +
-            (pow(anch_s_x, 2)+pow(anch_s_y, 2)+pow(anch_s_z, 2)) -
-            (pow(anch_c_x, 2)+pow(anch_c_y, 2)+pow(anch_c_z, 2))
+            (pow(anch_s_x, 2) + pow(anch_s_y, 2) + pow(anch_s_z, 2)) -
+            (pow(anch_c_x, 2) + pow(anch_c_y, 2) + pow(anch_c_z, 2))
             )
-        """
-        print("M11: " + str(M11))
-        print("M12: " + str(M12))
-        print("M13: " + str(M13))
-        print("M21: " + str(M21))
-        print("M22: " + str(M22))
-        print("M23: " + str(M23))
-        print("M31: " + str(M31))
-        print("M32: " + str(M32))
-        print("M33: " + str(M33))
-        print("\n")
-        print(((M33-(M31/M11)*M13) - (M32 - (M31/M11)*M12)*(M23-(M21/M11)*M13)/(M22-(M21/M11)*M12)))
-        print((M33-(M31/M11)*M13))
-        print((M32 - (M31/M11)*M12)*(M23-(M21/M11)*M13)/(M22-(M21/M11)*M12))
 
-        print((M32 - (M31/M11)*M12))
 
-        print((M23-(M21/M11)*M13))
-        print((M22-(M21/M11)*M12))
-        """
+        if m_11 == 0:
+            m_11 = add_noise(m_11)
 
-        if (M11 == 0):
-            M11 = add_noise(M11)
-        
-        if (M12 == 0):
-            M12 = add_noise(M12)
+        if m_12 == 0:
+            m_12 = add_noise(m_12)
 
-        if (M13 == 0):
-            M13 = add_noise(M13)
+        if m_13 == 0:
+            m_13 = add_noise(m_13)
 
-        if (M21 == 0):
-            M21 = add_noise(M21)
-        
-        if (M22 == 0):
-            M22 = add_noise(M22)
+        if m_21 == 0:
+            m_21 = add_noise(m_21)
 
-        if (M23 == 0):
-            M23 = add_noise(M23)
+        if m_22 == 0:
+            m_22 = add_noise(m_22)
 
-        if (M31 == 0):
-            M31 = add_noise(M31)
-        
-        if (M32 == 0):
-            M32 = add_noise(M32)
+        if m_23 == 0:
+            m_23 = add_noise(m_23)
 
-        if (M33 == 0):
-            M33 = add_noise(M33)
+        if m_31 == 0:
+            m_31 = add_noise(m_31)
+
+        if m_32 == 0:
+            m_32 = add_noise(m_32)
+
+        if m_33 == 0:
+            m_33 = add_noise(m_33)
 
         pre_tag_z = float(
-            ((N3 - (M31/M11)*N1) - (M32-(M31/M11)*M12)*(N2-(M21/M11)*N1)/(M22-(M21/M11)*M12))/((M33-(M31/M11)*M13) - (M32 - (M31/M11)*M12)*(M23-(M21/M11)*M13)/(M22-(M21/M11)*M12))
+            ((val_n_3 - (m_31/m_11)*val_n_1) - (m_32-(m_31/m_11)*m_12)*(val_n_2-(m_21/m_11)*val_n_1)/(m_22-(m_21/m_11)*m_12))/((m_33-(m_31/m_11)*m_13) - (m_32 - (m_31/m_11)*m_12)*(m_23-(m_21/m_11)*m_13)/(m_22-(m_21/m_11)*m_12))
             )
 
         pre_tag_y = float(
-            ((N2-(M21/M11)*N1) - (M23-(M21/M11)*M13)*tag_z) / (M22-(M21/M11)*M12)
+            ((val_n_2-(m_21/m_11)*val_n_1) - (m_23-(m_21/m_11)*m_13)*tag_z) / (m_22-(m_21/m_11)*m_12)
             )
 
-        pre_tag_x = float((N1-M13*tag_z-M12*tag_y) / M11)
+        pre_tag_x = float((val_n_1-m_13*tag_z-m_12*tag_y) / m_11)
 
         if ((iter_num > 20) or (sqrt(pow((pre_tag_x-tag_x), 2) + pow((pre_tag_y-tag_y), 2) + pow((pre_tag_z-tag_z), 2)) < 0.05)):
 
@@ -555,8 +535,7 @@ def position_pub_sub():
             min_id_ind = find_min_id_ind(SEL_ANCH_DICT)
 
             if mode == 1:
-                anch_s = find_anchor_s(SEL_ANCH_DICT,
-                                       min_id_ind,
+                anch_s = find_anchor_s(min_id_ind,
                                        selected_x,
                                        selected_y,
                                        selected_z)
@@ -566,10 +545,10 @@ def position_pub_sub():
                                                    selected_x,
                                                    selected_y,
                                                    selected_z)
-                L1 = start_point_of_line()
-                L2 = end_point_of_line()
+                line_st = start_point_of_line()
+                line_end = end_point_of_line()
 
-                position = calc_dist_1d_2a_ite(anch_s, anch_a, L1, L2,
+                position = calc_dist_1d_2a_ite(anch_s, anch_a, line_st, line_end,
                                                selected_tdoa[0])
 
                 msg.Tx = position[0]
@@ -580,8 +559,7 @@ def position_pub_sub():
                 pub.publish(msg)
 
             if mode == 2:
-                anch_s = find_anchor_s(SEL_ANCH_DICT,
-                                       min_id_ind,
+                anch_s = find_anchor_s(min_id_ind,
                                        selected_x,
                                        selected_y,
                                        selected_z)
@@ -603,7 +581,7 @@ def position_pub_sub():
                 position = calc_pos_2d_3a_ite(anch_s, anch_a, anch_b, tag_z,
                                               selected_tdoa[1], selected_tdoa[0])
 
-                # print("\tHesaplanan pos: " + str(position))
+                # print("\tCalculated pos: " + str(position))
                 msg.Tx = position[0]
                 msg.Ty = position[1]
                 msg.Tz = position[2]
@@ -611,35 +589,34 @@ def position_pub_sub():
             pub.publish(msg)
 
             if mode == 3:
-                anch_s = find_anchor_s(SEL_ANCH_DICT,
-                                    min_id_ind,
-                                    selected_x,
-                                    selected_y,
-                                    selected_z)
+                anch_s = find_anchor_s(min_id_ind,
+                                       selected_x,
+                                       selected_y,
+                                       selected_z)
 
                 anch_a, anch_a_ind = find_anchor_a(SEL_ANCH_DICT,
-                                                min_id_ind,
-                                                selected_x,
-                                                selected_y,
-                                                selected_z)
+                                                   min_id_ind,
+                                                   selected_x,
+                                                   selected_y,
+                                                   selected_z)
 
                 anch_b, anch_b_ind = find_anchor_b(SEL_ANCH_DICT,
-                                                min_id_ind,
-                                                anch_a_ind,
-                                                selected_x,
-                                                selected_y,
-                                                selected_z)
+                                                   min_id_ind,
+                                                   anch_a_ind,
+                                                   selected_x,
+                                                   selected_y,
+                                                   selected_z)
 
                 anch_c = find_anchor_c(SEL_ANCH_DICT,
-                                    min_id_ind,
-                                    anch_a_ind,
-                                    anch_b_ind,
-                                    selected_x,
-                                    selected_y,
-                                    selected_z)
+                                       min_id_ind,
+                                       anch_a_ind,
+                                       anch_b_ind,
+                                       selected_x,
+                                       selected_y,
+                                       selected_z)
 
                 position = calc_pos_3d_4a_ite(anch_s, anch_a, anch_b, anch_c,
-                                            selected_tdoa[0], selected_tdoa[1], selected_tdoa[2])
+                                              selected_tdoa[0], selected_tdoa[1], selected_tdoa[2])
 
                 msg.Tx = position[0]
                 msg.Ty = position[1]
@@ -653,69 +630,5 @@ def position_pub_sub():
 if __name__ == '__main__':
     try:
         position_pub_sub()
-
-        """
-        anch_s = [2.25, 3.15, 0.11]
-        anch_a = [4.21, 2.6, 2.84]
-        anch_b = [4.265, 0.45, 0.11]
-        anch_c = [1.84, 0.835, 2.84]
-        # tag = [2.70, 1.35, 0.44]
-        tag = [25, 25, 15]
-
-        anch_s_x = anch_s[0]
-        anch_s_y = anch_s[1]
-        anch_s_z = anch_s[2]
-
-        anch_a_x = anch_a[0]
-        anch_a_y = anch_a[1]
-        anch_a_z = anch_a[2]
-
-        anch_b_x = anch_b[0]
-        anch_b_y = anch_b[1]
-        anch_b_z = anch_b[2]
-
-        anch_c_x = anch_c[0]
-        anch_c_y = anch_c[1]
-        anch_c_z = anch_c[2]
-
-        tag_x = tag[0]
-        tag_y = tag[1]
-        tag_z = tag[2]
-
-
-        rs = sqrt(
-                pow((anch_s_x-tag_x), 2) +
-                pow((anch_s_y-tag_y), 2) +
-                pow((anch_s_z-tag_z), 2)
-                )
-
-        ra = sqrt(
-                pow((anch_a_x-tag_x), 2) +
-                pow((anch_a_y-tag_y), 2) +
-                pow((anch_a_z-tag_z), 2)
-                )
-
-        rb = sqrt(
-                pow((anch_b_x-tag_x), 2) +
-                pow((anch_b_y-tag_y), 2) +
-                pow((anch_b_z-tag_z), 2)
-                )
-
-        rc = sqrt(
-                pow((anch_c_x-tag_x), 2) +
-                pow((anch_c_y-tag_y), 2) +
-                pow((anch_c_z-tag_z), 2)
-                )
-
-        das = ra-rs
-        dbs = rb-rs
-        dcs = rc-rs
-
-        pos_3d = calc_pos_3d_4a_ite(anch_s, anch_a, anch_b, anch_c, das, dbs, dcs)
-
-        print("\n\n3D Position: " + str(pos_3d) + "\n\n")
-        """
-
-
     except rospy.ROSInterruptException:
         pass

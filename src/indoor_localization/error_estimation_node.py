@@ -12,6 +12,8 @@ from indoor_localization.msg import AnchorSelected
 from indoor_localization.msg import PositionInfo
 from indoor_localization.msg import ErrorEstimated
 
+import indoor_localization.positioning_node as pn
+
 # ----------------------------
 # GLOBAL VARIABLES #
 
@@ -21,13 +23,6 @@ CONTROL_POSITION = False
 CONTROL_SELECTED_ANCH = False
 
 # ----------------------------
-
-
-def localization_mode():
-    """ Get selected localization mode parameter """
-
-    loc_mode = int(rospy.get_param("/error_estimation_node/localization_mode"))
-    return loc_mode
 
 
 def std_of_tdoa():
@@ -66,66 +61,15 @@ def callback_selected_anchors(cb_selected_anch):
 # ----------------------------
 
 
-def find_min_id_ind(tmp_sel_anch_dict):
-
-    selected_id = list(tmp_sel_anch_dict['AnchorID'])
-    min_id_ind = selected_id.index(min(selected_id))
-
-    return min_id_ind
-
-
-def find_anchor_s(tmp_sel_anch_dict,
-                  min_id_ind,
-                  selected_x,
-                  selected_y,
-                  selected_z):
-
-    s_x = selected_x[min_id_ind]
-    s_y = selected_y[min_id_ind]
-    s_z = selected_z[min_id_ind]
-    anch_s = [s_x, s_y, s_z]
-
-    return anch_s
-
-
-def find_anchor_a(tmp_sel_anch_dict,
-                  min_id_ind,
-                  selected_x,
-                  selected_y,
-                  selected_z):
-
-    for i in range(len(tmp_sel_anch_dict['AnchorID'])):
-        if i != min_id_ind:
-            a_x, a_y, a_z = selected_x[i], selected_y[i], selected_z[i]
-            anch_a = [a_x, a_y, a_z]
-            anch_a_ind = i
-
-    return anch_a, anch_a_ind
-
-
-def find_anchor_b(tmp_sel_anch_dict,
-                  min_id_ind,
-                  anch_a_ind,
-                  selected_x,
-                  selected_y,
-                  selected_z):
-
-    for i in range(len(tmp_sel_anch_dict['AnchorID'])):
-        if (i != min_id_ind) and (i != anch_a_ind):
-            b_x, b_y, b_z = selected_x[i], selected_y[i], selected_z[i]
-            anch_b = [b_x, b_y, b_z]
-            # anch_b_ind = i
-
-    return anch_b   # , anch_b_ind
-
-
 def calc_accuracy(tag,
                   anch_a,
                   anch_b,
                   anch_s,
-                  sig_c):      # posiiton'dan last position gelmeli
-    """This function calculates the DRMS(Distance Root Mean Square) value of
-    position."""
+                  sig_c):
+    """
+    This function calculates the DRMS(Distance Root Mean Square) value of
+    position.
+    """
 
     # Given coordinates
     # T = np.zeros((1,3), dtype=float)
@@ -216,36 +160,33 @@ def calc_accuracy(tag,
 
             try:
                 sig_x = sqrt(pow(k11, 2)*x11 + 2*k11*k12*x12 + pow(k12, 2)*x22)
-            except ValueError as e:
-                print("Gx ValueError")
+            except ValueError: # as err:
+                print "Gx ValueError"
                 return -1
-            # print("Gx kök içi: " + str(pow(k11, 2)*x11 + 2*k11*k12*x12 + pow(k12, 2)*x22))
 
             try:
                 sig_y = sqrt(pow(k21, 2)*x11 + 2*k21*k22*x12 + pow(k22, 2)*x22)
-            except ValueError as e:
-                print("Gy ValueError")
+            except ValueError: # as err:
+                print "Gy ValueError"
                 return -1
-            # print("Gy kök içi: " + str(pow(k21, 2)*x11 + 2*k21*k22*x12 + pow(k22, 2)*x22))
-            # print("\n")
 
             sig_x_sig_y = (k11*x11+k12*x21)*k21 + (k11*x12+k12*x22)*k22
 
             # see Step 9 in iterative solution in document "Annex_IV_Accuracy Analysis"
             if sig_x_sig_y >= 0:
-                p2 = np.array([tag_x+sig_x/2, tag_y+sig_y/2, tag_z])
-                p1 = np.array([tag_x-sig_x/2, tag_y-sig_y/2, tag_z])
+                p_2 = np.array([tag_x + sig_x/2, tag_y + sig_y/2, tag_z])
+                p_1 = np.array([tag_x - sig_x/2, tag_y - sig_y/2, tag_z])
             else:
-                p2 = np.array([tag_x-sig_x/2, tag_y+sig_y/2, tag_z])
-                p1 = np.array([tag_x+sig_x/2, tag_y-sig_y/2, tag_z])
+                p_2 = np.array([tag_x - sig_x/2, tag_y + sig_y/2, tag_z])
+                p_1 = np.array([tag_x + sig_x/2, tag_y - sig_y/2, tag_z])
 
             # new radius_s values are calculated
-            radius_s_1 = LA.norm(p1-anch_s)
-            radius_s_2 = LA.norm(p2-anch_s)
+            radius_s_1 = LA.norm(p_1 - anch_s)
+            radius_s_2 = LA.norm(p_2 - anch_s)
 
             # threshold value is controlled
             sig_r_old = sig_r
-            sig_r = abs(radius_s_2-radius_s_1)
+            sig_r = abs(radius_s_2 - radius_s_1)
 
             if abs(sig_r_old - sig_r) < thr:
                 flag = 0
@@ -274,16 +215,25 @@ def accuracy_pub_sub():
             selected_x = list(SELECTED_ANCH_DICT['x'])
             selected_y = list(SELECTED_ANCH_DICT['y'])
             selected_z = list(SELECTED_ANCH_DICT['z'])
-            min_id_ind = find_min_id_ind(SELECTED_ANCH_DICT)
+            min_id_ind = pn.find_min_id_ind(SELECTED_ANCH_DICT)
 
-            anch_s = find_anchor_s(SELECTED_ANCH_DICT, min_id_ind,
-                                   selected_x, selected_y, selected_z)
+            anch_s = pn.find_anchor_s(min_id_ind,
+                                      selected_x,
+                                      selected_y,
+                                      selected_z)
 
-            anch_a, anch_a_ind = find_anchor_a(SELECTED_ANCH_DICT, min_id_ind,
-                                               selected_x, selected_y, selected_z)
+            anch_a, anch_a_ind = pn.find_anchor_a(SELECTED_ANCH_DICT,
+                                                  min_id_ind,
+                                                  selected_x,
+                                                  selected_y,
+                                                  selected_z)
 
-            anch_b = find_anchor_b(SELECTED_ANCH_DICT, min_id_ind, anch_a_ind,
-                                   selected_x, selected_y, selected_z)
+            anch_b, anch_b_ind = pn.find_anchor_b(SELECTED_ANCH_DICT,
+                                                  min_id_ind,
+                                                  anch_a_ind,
+                                                  selected_x,
+                                                  selected_y,
+                                                  selected_z)
 
             drms = calc_accuracy(POSITION, anch_a, anch_b, anch_s, sig_c)
 

@@ -289,7 +289,7 @@ def kpi_pub():
                 is_region_change = False
                 # print("\tRegion is same.\n")
 
-            # bölge değiştiği an o bölgedeki pos_stack'i sıfırla.
+            # As soon as the zone changes, reset pos_stack in that zone. 
             if is_region_change:
                 if temp_region_name not in region_names:
                     pass
