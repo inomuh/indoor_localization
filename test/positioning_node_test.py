@@ -438,7 +438,6 @@ class TestPositioningNode(unittest.TestCase):
 
 
 if __name__ == '__main__':
-	
 	import rosunit
-	rosunit.unitrun(PKG, NAME, TestPositioningNode, sysargs = "--cov", coverage_packages = ['indoor_localization', 'rospy', 'rosunit'])
-	# rosunit.unitrun(PKG, NAME, TestPositioningNode, sysargs = None, coverage_packages = [str(PKG)])
+	# rosunit.unitrun(PKG, NAME, TestPositioningNode, sysargs = "--cov", coverage_packages = ['indoor_localization', 'rospy', 'rosunit'])
+	rosunit.unitrun(PKG, NAME, TestPositioningNode, sysargs = None, coverage_packages = [str(PKG)])

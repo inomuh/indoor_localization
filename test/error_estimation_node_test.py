@@ -63,7 +63,6 @@ class TestErrorEstimationNode(unittest.TestCase):
         self.assertAlmostEqual(tested, test_result, 2)
 
 if __name__ == '__main__':
-	
 	import rosunit
 	# rosunit.unitrun(PKG, NAME, TestPositioningNode, sysargs = "--coverage", coverage_packages=[str(PKG)])
-	rosunit.unitrun(PKG, NAME, TestErrorEstimationNode, sysargs = None, coverage_packages = None)
+	rosunit.unitrun(PKG, NAME, TestErrorEstimationNode, sysargs = None, coverage_packages = [str(PKG)])

@@ -141,5 +141,5 @@ class TestKPICalculationNode(unittest.TestCase):
 
 if __name__ == '__main__':
 	import rosunit
-	rosunit.unitrun(PKG, NAME, TestKPICalculationNode)# , sysargs = "--cov", coverage_packages = ['indoor_localization', 'rospy', 'rosunit'])
+	rosunit.unitrun(PKG, NAME, TestKPICalculationNode , sysargs = None, coverage_packages = [str(PKG)])
     
