@@ -185,5 +185,5 @@ endforeach()
 
 ## Add folders to be run by python nosetests
 # catkin_add_nosetests(test/anchor_selection_node_test.py)
-# catkin_add_nosetests(test/positioning_node_test.py)
+catkin_add_nosetests(test/positioning_node_test.py)
 catkin_add_nosetests(test/error_estimation_node_test.py)
