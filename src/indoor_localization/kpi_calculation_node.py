@@ -72,6 +72,17 @@ def combine(sec, nsec):
 # ----------------------------
 
 
+def get_threshold_value():
+    """
+    Gets the threshold values from 'localization_params.yaml' file as a
+    float number.
+    """
+
+    thr = float(rospy.get_param("kpi_calculation_node/thr"))
+
+    return thr
+
+
 def get_regions():
     """ Gets the regions from 'region_params.yaml' file as a dictionary. """
 
@@ -90,6 +101,8 @@ def generate_polygon(tmp_regions):
 
     for i in range(len(all_region_names)):
         polygon_dict[all_region_names[i]] = Polygon(region_coordinates[i])
+
+    print(polygon_dict)
 
     return polygon_dict
 
@@ -178,21 +191,22 @@ def calc_dist_travelled(tmp_pos_stack, cnt):
     return distance_interval
 
 
-def calc_idle_time(tmp_pos_stack, cnt, distance_interval):
+def calc_idle_time(tmp_pos_stack, cnt, distance_interval, thr):
     """
     If the tag is in stationary, time intervals between pre and
     next positions are calculated.
+    thr = treshold value
     """
 
     idle_interval = float(0.0)
 
-    if distance_interval < 0.00001:
+    if distance_interval < thr:
         idle_interval = tmp_pos_stack[cnt+1][3] - tmp_pos_stack[cnt][3]
 
     return idle_interval
 
 
-def calc_motion_time(tmp_pos_stack, cnt, distance_interval):
+def calc_motion_time(tmp_pos_stack, cnt, distance_interval, thr):
     """
     If the tag is in movable stage, time intervals between pre and
     next positions are calculated.
@@ -200,7 +214,7 @@ def calc_motion_time(tmp_pos_stack, cnt, distance_interval):
 
     motion_interval = float(0.0)
 
-    if distance_interval >= 0.00001:
+    if distance_interval >= thr:
         motion_interval = tmp_pos_stack[cnt+1][3] - tmp_pos_stack[cnt][3]
 
     return motion_interval
@@ -248,6 +262,10 @@ def kpi_pub():
     # region_params.yaml'de dictionary tipinde belirlenen bölgeleri al
     regions_dict = get_regions()
     region_names = regions_dict.keys()
+
+    # GET THRESHOLD VAL
+    # ----------------------------
+    thr = get_threshold_value()
 
     # belirlenen bölgeleri poligonlara çevir ve dictionary olarak döndür
     polygons_dict = generate_polygon(regions_dict)
@@ -304,8 +322,8 @@ def kpi_pub():
             elif not len(rb_pos_stack) < 2:
                 rb_dist_interval = calc_dist_travelled(rb_pos_stack, rb_cnt)
                 rb_total_time = calc_total_time(rb_pos_stack, rb_cnt)
-                rb_idle_interval = calc_idle_time(rb_pos_stack, rb_cnt, rb_dist_interval)
-                rb_motion_interval = calc_motion_time(rb_pos_stack, rb_cnt, rb_dist_interval)
+                rb_idle_interval = calc_idle_time(rb_pos_stack, rb_cnt, rb_dist_interval, thr)
+                rb_motion_interval = calc_motion_time(rb_pos_stack, rb_cnt, rb_dist_interval, thr)
 
                 rb_kpi_dict[temp_region_name]['kpi5'] += rb_dist_interval
                 rb_kpi_dict[temp_region_name]['kpi6'] += rb_total_time
