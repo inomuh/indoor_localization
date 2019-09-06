@@ -102,8 +102,6 @@ def generate_polygon(tmp_regions):
     for i in range(len(all_region_names)):
         polygon_dict[all_region_names[i]] = Polygon(region_coordinates[i])
 
-    print(polygon_dict)
-
     return polygon_dict
 
 
