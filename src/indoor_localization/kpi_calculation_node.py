@@ -337,8 +337,8 @@ def kpi_pub():
 
             if not len(g_pos_stack) < 2:
                 g_dist_interval = calc_dist_travelled(g_pos_stack, g_cnt)
-                g_idle_interval = calc_idle_time(g_pos_stack, g_cnt, g_dist_interval)
-                g_motion_interval = calc_motion_time(g_pos_stack, g_cnt, g_dist_interval)
+                g_idle_interval = calc_idle_time(g_pos_stack, g_cnt, g_dist_interval, thr)
+                g_motion_interval = calc_motion_time(g_pos_stack, g_cnt, g_dist_interval, thr)
 
                 g_kpi_dict['kpi1'] += g_dist_interval
                 g_kpi_dict['kpi2'] += g_idle_interval
