@@ -263,7 +263,7 @@ def all_combinations(position_list, comb_anch_tmp):
         anch_a = [comb_anch_tmp[count, 4], comb_anch_tmp[count, 5], comb_anch_tmp[count, 6]]
         anch_b = [comb_anch_tmp[count, 7], comb_anch_tmp[count, 8], comb_anch_tmp[count, 9]]
         anch_s = [comb_anch_tmp[count, 10], comb_anch_tmp[count, 11], comb_anch_tmp[count, 12]]
-        sig_c = std_of_tdoa()
+        sig_c = 0.0625
         # drms = calc_accuracy(tag, anch_a, anch_b, anch_s, sig_c)
         drms = en.calc_accuracy(tag, anch_a, anch_b, anch_s, sig_c)
         if drms == -1:
@@ -348,61 +348,6 @@ def select_anchors_main(tmp_ips_dict, min_pdop, comb_anch_last):       # IPS
     return total_anch_coord_pdop_dict
 
 
-def generate_selected_tdoa(selected_anchors_dict, mode, tag_index):
-    """
-    Return: tdoa_list
-    Type  : list
-    """
-
-    tmp_t = tag_index
-
-    tdoa_list = list()
-
-    selected_id = list(selected_anchors_dict.keys())
-    selected_coords = list(selected_anchors_dict.values())
-
-    min_ind = selected_id.index(min(selected_id))
-
-    tmp_s = np.array(selected_coords[min_ind])
-    radius_s = LA.norm(tmp_t-tmp_s)
-
-    if mode == 1:
-        a_control = False
-
-    elif mode == 2:
-        a_control = False
-        b_control = False
-
-    elif mode == 3:
-        a_control = False
-        b_control = False
-        c_control = False
-
-    for i in range(len(selected_id)):
-        if i != min_ind and not a_control:      # == False:
-            tmp_a = np.array(selected_coords[i])
-            radius_a = LA.norm(tmp_t-tmp_a)
-            das = radius_a - radius_s
-            tdoa_list.append(das)
-            a_control = True
-
-        elif i != min_ind and not b_control:        # == False:
-            tmp_b = np.array(selected_coords[i])
-            radius_b = LA.norm(tmp_t - tmp_b)
-            dbs = radius_b - radius_s
-            tdoa_list.append(dbs)
-            b_control = True
-
-        elif i != min_ind and not c_control:        # == False:
-            tmp_c = np.array(selected_coords[i])
-            radius_c = LA.norm(tmp_t - tmp_c)
-            dcs = radius_c - radius_s
-            tdoa_list.append(dcs)
-            c_control = True
-
-    return tdoa_list
-
-
 def find_sel_anch_index(tmp_ips_dict, selected_anchors_dict):
     """ Find the index of the selected anchors' indexes from the anchors which comes from IPS. """
 
@@ -470,6 +415,62 @@ def detect_finalised_tdoa_values(min_ind, sel_anch_tdoa_list):
 
 
 # ----------------------------
+
+
+def generate_selected_tdoa(selected_anchors_dict, mode, tag_index):
+    """
+    Return: tdoa_list
+    Type  : list
+    """
+
+    tmp_t = tag_index
+
+    tdoa_list = list()
+
+    selected_id = list(selected_anchors_dict.keys())
+    selected_coords = list(selected_anchors_dict.values())
+
+    min_ind = selected_id.index(min(selected_id))
+
+    tmp_s = np.array(selected_coords[min_ind])
+    radius_s = LA.norm(tmp_t-tmp_s)
+
+    if mode == 1:
+        a_control = False
+
+    elif mode == 2:
+        a_control = False
+        b_control = False
+
+    elif mode == 3:
+        a_control = False
+        b_control = False
+        c_control = False
+
+    for i in range(len(selected_id)):
+        if i != min_ind and not a_control:      # == False:
+            tmp_a = np.array(selected_coords[i])
+            radius_a = LA.norm(tmp_t-tmp_a)
+            das = radius_a - radius_s
+            tdoa_list.append(das)
+            a_control = True
+
+        elif i != min_ind and not b_control:        # == False:
+            tmp_b = np.array(selected_coords[i])
+            radius_b = LA.norm(tmp_t - tmp_b)
+            dbs = radius_b - radius_s
+            tdoa_list.append(dbs)
+            b_control = True
+
+        elif i != min_ind and not c_control:        # == False:
+            tmp_c = np.array(selected_coords[i])
+            radius_c = LA.norm(tmp_t - tmp_c)
+            dcs = radius_c - radius_s
+            tdoa_list.append(dcs)
+            c_control = True
+
+    return tdoa_list
+
 
 
 def select_anchors_except_2d(tmp_ips_dict, mode):
