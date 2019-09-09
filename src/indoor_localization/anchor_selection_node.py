@@ -253,7 +253,7 @@ def tmp_anch_combination(row, comb_anch, selected_anchors):
     return comb_anch_tmp
 
 
-def all_combinations(position_list, comb_anch_tmp):
+def all_combinations(position_list, comb_anch_tmp, sig_c):
     """
     Return: comb_anch_last
     Type  : array
@@ -263,7 +263,7 @@ def all_combinations(position_list, comb_anch_tmp):
         anch_a = [comb_anch_tmp[count, 4], comb_anch_tmp[count, 5], comb_anch_tmp[count, 6]]
         anch_b = [comb_anch_tmp[count, 7], comb_anch_tmp[count, 8], comb_anch_tmp[count, 9]]
         anch_s = [comb_anch_tmp[count, 10], comb_anch_tmp[count, 11], comb_anch_tmp[count, 12]]
-        sig_c = 0.0625
+        # sig_c = 0.0625
         # drms = calc_accuracy(tag, anch_a, anch_b, anch_s, sig_c)
         drms = en.calc_accuracy(tag, anch_a, anch_b, anch_s, sig_c)
         if drms == -1:
@@ -511,6 +511,7 @@ def anchor_pub_sub():
     rate = rospy.Rate(25)
     mode = localization_mode()
     initial_position = get_initial_position()
+    sig_c = std_of_tdoa()
 
     while not rospy.is_shutdown():
 
@@ -541,7 +542,7 @@ def anchor_pub_sub():
                 selected_anchors = listed_anch(row, tag_anchor_sorting)
                 comb_anch = anch_combination(row)
                 comb_anch_tmp = tmp_anch_combination(row, comb_anch, selected_anchors)
-                comb_anch_last = all_combinations(position_list, comb_anch_tmp)
+                comb_anch_last = all_combinations(position_list, comb_anch_tmp, sig_c)
                 min_pdop = find_min_pdop(comb_anch_last)
                 selected_anchors_dict = select_anchors_main(IPS_DICT, min_pdop, comb_anch_last)
 
