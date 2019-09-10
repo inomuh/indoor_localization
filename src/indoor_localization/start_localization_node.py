@@ -10,14 +10,8 @@ def main():
     mode = int(rospy.get_param("/start_localization_node/localization_mode"))
 
     if mode == 2:
-        print("\n\n@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@\n\n")
-        print("Mevcut Mode = " + str(mode))
-        print("\n\n@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@\n\n")
         os.system("roslaunch indoor_localization localization_2D.launch")
     else:
-        print("\n\n@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@\n\n")
-        print("Mevcut Mode = " + str(mode))
-        print("\n\n@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@\n\n")
         os.system("roslaunch indoor_localization localization_other.launch")
 
 if __name__=='__main__':
