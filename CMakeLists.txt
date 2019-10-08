@@ -55,7 +55,7 @@ catkin_python_setup()
 ## Generate messages in the 'msg' folder
 add_message_files(
   FILES
-  AnchorScan.msg
+  # AnchorScan.msg
   AnchorSelected.msg
   PositionInfo.msg
   ErrorEstimated.msg
@@ -68,6 +68,7 @@ generate_messages(
   DEPENDENCIES
   geometry_msgs
   std_msgs
+  plab_comm
 )
 
 ################################################
@@ -102,9 +103,9 @@ generate_messages(
 ## DEPENDS: system dependencies of this project that dependent projects also
 ## need
 catkin_package(
-# INCLUDE_DIRS include
-  LIBRARIES indoor_localization
-  CATKIN_DEPENDS geometry_msgs message_generation roscpp rospy rostest
+  # INCLUDE_DIRS include
+  LIBRARIES indoor_localization plab_comm
+  CATKIN_DEPENDS geometry_msgs message_generation roscpp rospy rostest plab_comm
   DEPENDS system_lib
 )
 
@@ -185,5 +186,5 @@ endforeach()
 
 ## Add folders to be run by python nosetests
 # catkin_add_nosetests(test/anchor_selection_node_test.py)
-catkin_add_nosetests(test/positioning_node_test.py)
-catkin_add_nosetests(test/error_estimation_node_test.py)
+# catkin_add_nosetests(test/positioning_node_test.py)
+# catkin_add_nosetests(test/error_estimation_node_test.py)
