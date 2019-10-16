@@ -3,6 +3,8 @@
 # license removed for brevity	
 
 #########################################################################################
+#                               INSTRUCTIONS                                            #
+#########################################################################################
 # TODO: ASSUME THAT YOU HAVE A SYSTEM WITH 4 ANCHORS.
 #
 #       LET'S SAY THE IDS OF ANCHORS ARE: 
@@ -29,7 +31,8 @@
 #   ALL OF THAT DATA THROUGH "AnchorScan.msg".
 #########################################################################################
 
-# import essential libraries
+# Import essential libraries
+# If exists, add additional libraries according to your driver.
 import time
 import rospy
 
@@ -47,7 +50,7 @@ def read_data():
 
 def anchor_data_publisher():
 
-    # Initialize ros node
+    # Initialize ros node.
     rospy.init_node("hardware_ros_driver_template", anonymous = True)
 
     # This line declares that your node is publishing to the IPS topic using the message type AnchorScan.
