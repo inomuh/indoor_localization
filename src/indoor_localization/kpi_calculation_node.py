@@ -7,7 +7,6 @@ import rospy
 
 from shapely.geometry import Point, Polygon
 
-from indoor_localization.msg import AnchorScan
 from indoor_localization.msg import PositionInfo
 from indoor_localization.msg import ParamsKPI
 
@@ -16,9 +15,7 @@ from indoor_localization.msg import ParamsKPI
 # GLOBAL VARIABLES #
 
 CURRENT_POS = list()
-TIME = float()
 CONTROL_POS = False
-CONTROL_IPS = False
 
 # ----------------------------
 
@@ -28,50 +25,11 @@ def callback_pos(cb_last_pos):
     global CURRENT_POS
     global CONTROL_POS
 
-    pos_time = combine(
-        cb_last_pos.header.stamp.secs,
-        cb_last_pos.header.stamp.nsecs
-        )
-
-    CURRENT_POS = [cb_last_pos.Tx, cb_last_pos.Ty, cb_last_pos.Tz, pos_time]
+    CURRENT_POS = [cb_last_pos.Tx, cb_last_pos.Ty, cb_last_pos.Tz, rospy.get_time()]
     CONTROL_POS = True
 
 
-def callback_ips(cb_all_anch):
-
-    global TIME
-    global CONTROL_IPS
-
-    ips_dict = {
-        'header': {
-            'stamp': {
-                'secs': cb_all_anch.header.stamp.secs,
-                'nsecs': cb_all_anch.header.stamp.nsecs
-                }
-            }
-    }
-    time_sec = ips_dict['header']['stamp']['secs']
-    time_nsec = ips_dict['header']['stamp']['nsecs']
-
-    TIME = combine(time_sec, time_nsec)
-    CONTROL_IPS = True
 # ----------------------------
-
-
-def combine(sec, nsec):
-    """
-    It combines the specified second and nanosecond values as a float number.
-    """
-
-    if nsec == 0:
-        return sec
-
-    combined_time = float(sec + nsec * 10 ** -(math.floor(math.log10(nsec)) + 1))
-
-    return combined_time
-# ----------------------------
-
-
 def get_threshold_value():
     """
     Gets the threshold values from 'localization_params.yaml' file as a
@@ -79,7 +37,6 @@ def get_threshold_value():
     """
 
     thr = float(rospy.get_param("kpi_calculation_node/thr"))
-
     return thr
 
 
@@ -87,7 +44,6 @@ def get_regions():
     """ Gets the regions from 'region_params.yaml' file as a dictionary. """
 
     regions = dict(rospy.get_param("kpi_calculation_node/regions"))
-
     return regions
 
 
@@ -123,38 +79,46 @@ def detect_current_region(tmp_current_pos, tmp_polygons):
             isregion = True
 
     if isregion:
-        # print(isregion)
-        # print(current_region_name
         return current_region_name, isregion
     else:
         current_region_name = str("The tag is outside of defined regions!")
-        # print(isregion)
-        # print(current_region_name)
         return current_region_name, isregion
+
 # ----------------------------
+def calc_time_interval(tmp_pos_list, cnt):
 
+    time_interval = float(0.0)
+    time_interval = tmp_pos_list[cnt+1][3] - tmp_pos_list[cnt][3]
+    return time_interval
 
-def set_new_g_kpi_dictionary():
+def calc_dist_interval(tmp_pos_list, cnt):
+    """ Calculates the distance interval between pre and next positions. """
 
-    kpi_dict = dict()
+    distance_interval = math.sqrt(
+        pow((tmp_pos_list[cnt+1][0] - tmp_pos_list[cnt][0]), 2) +
+        pow((tmp_pos_list[cnt+1][1] - tmp_pos_list[cnt][1]), 2) +
+        pow((tmp_pos_list[cnt+1][2] - tmp_pos_list[cnt][2]), 2))
 
-    distance_travelled = float(0.0)
-    motion_time = float(0.0)
-    idle_time = float(0.0)
-    efficiency = float(0.0)
+    return distance_interval
 
-    kpi_dict = {
-        'kpi1': distance_travelled,
-        'kpi2': idle_time,
-        'kpi3': motion_time,
-        'kpi4': efficiency
-    }
+def calc_efficiency(motion_time, elapsed_time):
+    """ It calculates the efficiency. """
 
-    return kpi_dict
+    efficiency = float(((motion_time) / (elapsed_time)) * 100)
+    return efficiency
 
+def calc_total_time(tmp_pos_list, cnt):
+    """ It calculates the elapsed time in a region. """
+
+    tot_tm = tmp_pos_list[cnt+1][3] - tmp_pos_list[cnt][3]
+    return tot_tm
 
 def set_new_rb_kpi_dictionary(region_names):
-
+    """
+    Generates an empty dictionary which collects the parameters
+    KPI-5, KPI-6, KPI-7, KPI-8 and KPI-9 for each region.
+    It defined as 'Region Based KPI Dictionary'.
+    """
     rb_kpi_dict = dict()
 
     for region_name in region_names:
@@ -174,220 +138,212 @@ def set_new_rb_kpi_dictionary(region_names):
         }
 
     return rb_kpi_dict
-# ----------------------------
-
-
-def calc_dist_travelled(tmp_pos_stack, cnt):
-    """ Calculates the distance interval between pre and next positions. """
-
-    distance_interval = math.sqrt(
-        pow((tmp_pos_stack[cnt+1][0] - tmp_pos_stack[cnt][0]), 2) +
-        pow((tmp_pos_stack[cnt+1][1] - tmp_pos_stack[cnt][1]), 2) +
-        pow((tmp_pos_stack[cnt+1][2] - tmp_pos_stack[cnt][2]), 2)
-    )
-
-    return distance_interval
-
-
-def calc_idle_time(tmp_pos_stack, cnt, distance_interval, thr):
-    """
-    If the tag is in stationary, time intervals between pre and
-    next positions are calculated.
-    thr = treshold value
-    """
-
-    idle_interval = float(0.0)
-
-    if distance_interval < thr:
-        idle_interval = tmp_pos_stack[cnt+1][3] - tmp_pos_stack[cnt][3]
-
-    return idle_interval
-
-
-def calc_motion_time(tmp_pos_stack, cnt, distance_interval, thr):
-    """
-    If the tag is in movable stage, time intervals between pre and
-    next positions are calculated.
-    """
-
-    motion_interval = float(0.0)
-
-    if distance_interval >= thr:
-        motion_interval = tmp_pos_stack[cnt+1][3] - tmp_pos_stack[cnt][3]
-
-    return motion_interval
-
-
-def calc_total_time(tmp_pos_stack, cnt):
-    """ It calculates the elapsed time in a region. """
-
-    tot_tm = tmp_pos_stack[cnt+1][3] - tmp_pos_stack[cnt][3]
-
-    return tot_tm
-
-
-def calc_efficiency(motion_time, elapsed_time):
-    """ It calculates the efficiency. """
-
-    efficiency = float(((motion_time) / (elapsed_time)) * 100)
-
-    return efficiency
 
 
 def kpi_pub():
 
     rospy.init_node("kpi_calculation_node", anonymous=True)
     rospy.Subscriber('position', PositionInfo, callback_pos)
-    rospy.Subscriber('IPS', AnchorScan, callback_ips)
+
     pub = rospy.Publisher('kpi', ParamsKPI, queue_size=2)
-    rate = rospy.Rate(25)
-
-    # SET PERIOD
-    # ----------------------------
-    # get second and nanosecond values of period
-    period_s = rospy.get_param("/kpi_calculation_node/period_sec")      # 15
-    period_ns = rospy.get_param("/kpi_calculation_node/period_nsec")    # 0
-
-    # combine the period second and nanosecond as a float number
-    period = combine(period_s, period_ns)
-
-    # kpi parametrelerinin hesaplanma aralığını belirle
-    # Örn: 8 saatte bir, 15 dk'da bir ...
-    kpi_calculation_period = rospy.Duration(period_s, period_ns)
+    rate = rospy.Rate(int(rospy.get_param("/kpi_calculation_node/rate")))
 
     # GET REGIONS
     # ----------------------------
-    # region_params.yaml'de dictionary tipinde belirlenen bölgeleri al
     regions_dict = get_regions()
     region_names = regions_dict.keys()
+    # convert specified regions to polygons and return them as dictionary
+    polygons_dict = generate_polygon(regions_dict)
 
     # GET THRESHOLD VAL
     # ----------------------------
     thr = get_threshold_value()
-
-    # belirlenen bölgeleri poligonlara çevir ve dictionary olarak döndür
-    polygons_dict = generate_polygon(regions_dict)
 
     # INITIAL VALUES
     # ----------------------------
     is_region_change = False
     temp_region_name = "TRIAL"
 
-    g_pos_stack = list()
-    rb_pos_stack = list()
+    pos_list = list()
+    rb_pos_list = list()
 
-    g_kpi_dict = set_new_g_kpi_dictionary()
+    delta_dist = 0
+
+    idle_time = 0
+    motion_time = 0
+    distance_travelled = 0
+    efficiency = 0
+
+    # rb_idle_time = 0
+    # rb_motion_time = 0
+    # rb_distance_travelled = 0
+    # rb_total_time = 0
+    # rb_efficiency = 0
+
+    fifo_len = 15
+
     rb_kpi_dict = set_new_rb_kpi_dictionary(region_names)
-
-    g_cnt = 0
-    rb_cnt = 0
-
-    simulation_start = rospy.Time.now()
-    # ----------------------------
+    simulation_start = rospy.get_time()
 
     while not rospy.is_shutdown():
-
         msg = ParamsKPI()
 
-        if CONTROL_POS and CONTROL_IPS:
+        if CONTROL_POS:
+# --------------------------------------------------------------------------------------
 
-            g_pos_stack.append(CURRENT_POS)
-            rb_pos_stack.append(CURRENT_POS)
+            pos_list.append(CURRENT_POS)
+
+            # Generate FIFO
+            if len(pos_list) == fifo_len:
+
+                mean_delta_tx = 0
+                mean_delta_ty = 0
+
+                for cnt in range(len(pos_list)-1):
+                    dist_tx = pos_list[cnt+1][0] - pos_list[cnt][0]
+                    dist_ty = pos_list[cnt+1][1] - pos_list[cnt][1]
+                    mean_delta_tx += (dist_tx / (len(pos_list) - 1))
+                    mean_delta_ty += (dist_ty / (len(pos_list) - 1))
+
+                mean_delta_dist = math.sqrt(pow(mean_delta_tx, 2) + pow(mean_delta_ty, 2))
+
+                print(len(pos_list))
+                print("\n-----MEAN DIST-----")
+                print(mean_delta_dist)
+                print("mean_delta_tx: " + str(mean_delta_tx))
+                print("mean_delta_ty: " + str(mean_delta_ty))
+
+                if mean_delta_dist < thr: # and len(pos_list) == (fifo_len - 1):
+                    time_interval = calc_time_interval(pos_list, (fifo_len - 3))
+                    idle_time += time_interval                                  # KPI 2
+
+                elif mean_delta_dist >= thr: # and len(pos_list) == (fifo_len - 1):
+                    time_interval = calc_time_interval(pos_list, (fifo_len - 3))
+                    motion_time += time_interval                                # KPI 3
+
+                    dist_interval = calc_dist_interval(pos_list, fifo_len - 3)
+                    distance_travelled += dist_interval                         # KPI 1
+
+                elapsed_time = rospy.get_time() - simulation_start
+                if elapsed_time == 0:
+                    pass
+                else:
+                    efficiency = calc_efficiency(motion_time, elapsed_time)     # KPI 4
+
+                pos_list.pop(0)
+
+            msg.kpi1 = distance_travelled
+            msg.kpi2 = idle_time
+            msg.kpi3 = motion_time
+            msg.kpi4 = efficiency
+
+# --------------------------------------------------------------------------------------
 
             current_region_name, isregion = detect_current_region(CURRENT_POS, polygons_dict)
-            # print("\n\tREGION: " + str(current_region_name))
 
-            # detect the region is changed or not
+            # Control whether the region is change or not.
             if current_region_name != temp_region_name:
                 is_region_change = True
-                # print("\tRegion is changed.\n")
             else:
                 is_region_change = False
-                # print("\tRegion is same.\n")
 
-            # As soon as the zone changes, reset pos_stack in that zone. 
+            # When the region changed, re-new the stack in that region.
             if is_region_change:
                 if temp_region_name not in region_names:
                     pass
                 else:
-                    rb_pos_stack = list()
-                    rb_cnt = 0
+                    rb_pos_list = list()
             else:
+                # If the region did not changed, do nothing.
                 pass
 
-            if temp_region_name not in region_names:
-                pass
-            elif not len(rb_pos_stack) < 2:
-                rb_dist_interval = calc_dist_travelled(rb_pos_stack, rb_cnt)
-                rb_total_time = calc_total_time(rb_pos_stack, rb_cnt)
-                rb_idle_interval = calc_idle_time(rb_pos_stack, rb_cnt, rb_dist_interval, thr)
-                rb_motion_interval = calc_motion_time(rb_pos_stack, rb_cnt, rb_dist_interval, thr)
+            rb_pos_list.append(CURRENT_POS)
 
-                rb_kpi_dict[temp_region_name]['kpi5'] += rb_dist_interval
-                rb_kpi_dict[temp_region_name]['kpi6'] += rb_total_time
-                rb_kpi_dict[temp_region_name]['kpi7'] += rb_idle_interval
-                rb_kpi_dict[temp_region_name]['kpi8'] += rb_motion_interval
-                rb_kpi_dict[temp_region_name]['kpi9'] = calc_efficiency(
-                    rb_kpi_dict[temp_region_name]['kpi8'],
-                    rb_kpi_dict[temp_region_name]['kpi6']
-                    )
+            # Generate FIFO
+            if len(rb_pos_list) == fifo_len:
 
-                rb_cnt += 1
-                # print("\trb_cnt: " + str(rb_cnt))
+                rb_mean_delta_tx = 0
+                rb_mean_delta_ty = 0
 
-            if not len(g_pos_stack) < 2:
-                g_dist_interval = calc_dist_travelled(g_pos_stack, g_cnt)
-                g_idle_interval = calc_idle_time(g_pos_stack, g_cnt, g_dist_interval, thr)
-                g_motion_interval = calc_motion_time(g_pos_stack, g_cnt, g_dist_interval, thr)
+                for cnt in range(len(rb_pos_list) - 1):
+                    rb_dist_tx = rb_pos_list[cnt+1][0] - rb_pos_list[cnt][0]
+                    rb_dist_ty = rb_pos_list[cnt+1][1] - rb_pos_list[cnt][1]
+                    rb_mean_delta_tx += (rb_dist_tx / (len(rb_pos_list) - 1))
+                    rb_mean_delta_ty += (rb_dist_ty / (len(rb_pos_list) - 1))
 
-                g_kpi_dict['kpi1'] += g_dist_interval
-                g_kpi_dict['kpi2'] += g_idle_interval
-                g_kpi_dict['kpi3'] += g_motion_interval
+                rb_mean_delta_dist = math.sqrt(pow(rb_mean_delta_tx, 2) + pow(rb_mean_delta_ty, 2))
 
-                g_cnt += 1
-                # print("\tg_cnt: " + str(g_cnt))
+                if rb_mean_delta_dist < thr:
+                    # RB Idle Time Calculation
+                    rb_time_interval = calc_time_interval(rb_pos_list, (fifo_len - 3))
+                    rb_kpi_dict[temp_region_name]['kpi7'] += rb_time_interval               # KPI 7
+                    # rb_idle_time += rb_time_interval                            
+
+                elif rb_mean_delta_dist >= thr:
+                    # RB Motion Time Calculation
+                    rb_time_interval = calc_time_interval(rb_pos_list, (fifo_len - 3))
+                    rb_kpi_dict[temp_region_name]['kpi8'] += rb_time_interval               # KPI 8
+                    # rb_motion_time += rb_time_interval
+
+                    # RB Distance Travelled Calculation
+                    rb_dist_interval = calc_dist_interval(rb_pos_list, (fifo_len - 3))
+                    rb_kpi_dict[temp_region_name]['kpi5'] += rb_dist_interval               # KPI 5
+                    # rb_distance_travelled += rb_dist_interval
+
+                # RB Total Time Calculation
+                rb_kpi_dict[temp_region_name]['kpi6'] += calc_total_time(rb_pos_list,       # KPI 6
+                                                                         (fifo_len - 3))
+                # rb_total_time += calc_total_time(rb_pos_list, (fifo_len - 3))
+
+                if rb_kpi_dict[temp_region_name]['kpi6'] == 0:
+                    rb_kpi_dict[temp_region_name]['kpi9'] = 0.0
+                    # pass
+                else:
+                    # RB Efficiency Calculation
+                    rb_kpi_dict[temp_region_name]['kpi9'] = calc_efficiency(                # KPI 9
+                        rb_kpi_dict[temp_region_name]['kpi8'],
+                        rb_kpi_dict[temp_region_name]['kpi6'])
+                    # rb_efficiency = calc_efficiency(rb_motion_time, rb_total_time)
+
+                # rb_kpi_dict[temp_region_name]['kpi5'] = rb_distance_travelled
+                # rb_kpi_dict[temp_region_name]['kpi6'] = rb_total_time
+                # rb_kpi_dict[temp_region_name]['kpi7'] = rb_idle_time
+                # rb_kpi_dict[temp_region_name]['kpi8'] = rb_motion_time
+                # rb_kpi_dict[temp_region_name]['kpi9'] = rb_efficiency
+
+                rb_pos_list.pop(0)
 
             temp_region_name = current_region_name
 
-            if rospy.Time.now() > simulation_start + kpi_calculation_period:
+            msg.current_region_name = temp_region_name
 
-                g_kpi_dict['kpi4'] = calc_efficiency(g_kpi_dict['kpi3'], period)
+            msg.reg_1_kpi5 = rb_kpi_dict['Region1']['kpi5']
+            msg.reg_1_kpi6 = rb_kpi_dict['Region1']['kpi6']
+            msg.reg_1_kpi7 = rb_kpi_dict['Region1']['kpi7']
+            msg.reg_1_kpi8 = rb_kpi_dict['Region1']['kpi8']
+            msg.reg_1_kpi9 = rb_kpi_dict['Region1']['kpi9']
 
-                simulation_start = rospy.Time.now()
+            msg.reg_2_kpi5 = rb_kpi_dict['Region2']['kpi5']
+            msg.reg_2_kpi6 = rb_kpi_dict['Region2']['kpi6']
+            msg.reg_2_kpi7 = rb_kpi_dict['Region2']['kpi7']
+            msg.reg_2_kpi8 = rb_kpi_dict['Region2']['kpi8']
+            msg.reg_2_kpi9 = rb_kpi_dict['Region2']['kpi9']
 
-                print("\n\t*************************************************************************************\n")
-                print("\tG Distance Travelled: " + str(g_kpi_dict['kpi1']))
-                print("\tG Idle Time         : " + str(g_kpi_dict['kpi2']))
-                print("\tG Motion Time       : " + str(g_kpi_dict['kpi3']))
-                print("\tG Efficiency        : " + str(g_kpi_dict['kpi4']))
+            msg.reg_3_kpi5 = rb_kpi_dict['Region3']['kpi5']
+            msg.reg_3_kpi6 = rb_kpi_dict['Region3']['kpi6']
+            msg.reg_3_kpi7 = rb_kpi_dict['Region3']['kpi7']
+            msg.reg_3_kpi8 = rb_kpi_dict['Region3']['kpi8']
+            msg.reg_3_kpi9 = rb_kpi_dict['Region3']['kpi9']
 
-                print("\n\tG KPI Dict        : " + str(g_kpi_dict))
+            msg.reg_4_kpi5 = rb_kpi_dict['Region4']['kpi5']
+            msg.reg_4_kpi6 = rb_kpi_dict['Region4']['kpi6']
+            msg.reg_4_kpi7 = rb_kpi_dict['Region4']['kpi7']
+            msg.reg_4_kpi8 = rb_kpi_dict['Region4']['kpi8']
+            msg.reg_4_kpi9 = rb_kpi_dict['Region4']['kpi9']
 
-                print("\n\t__________o__________o__________o__________\n")
-
-                print("\tRB Distance Travelled: " + str(rb_kpi_dict[temp_region_name]['kpi5']))
-                print("\tRB Total Time        : " + str(rb_kpi_dict[temp_region_name]['kpi6']))
-                print("\tRB Idle Time         : " + str(rb_kpi_dict[temp_region_name]['kpi7']))
-                print("\tRB Motion Time       : " + str(rb_kpi_dict[temp_region_name]['kpi8']))
-                print("\tRB Efficiency        : " + str(rb_kpi_dict[temp_region_name]['kpi9']))
-
-                print("\n\tRB KPI Dict        : " + str(rb_kpi_dict))
-                print("\n")
-
-                rb_pos_stack = list()
-                g_pos_stack = list()
-
-                g_cnt = 0
-                rb_cnt = 0
-
-                rb_kpi_dict = set_new_rb_kpi_dictionary(region_names)
-                g_kpi_dict = set_new_g_kpi_dictionary()
-
-            msg.current_region = temp_region_name
             pub.publish(msg)
 
         rate.sleep()
-
 
 if __name__ == '__main__':
     try:

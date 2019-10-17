@@ -4,7 +4,6 @@
 import rospy
 import os
 
-
 def main():
     rospy.init_node('start_localization_node')
     mode = int(rospy.get_param("/start_localization_node/localization_mode"))

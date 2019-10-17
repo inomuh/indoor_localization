@@ -1,32 +1,38 @@
-#!/usr/bin/env python
+"""
+    This module simulates the movement of a robot on a flat surface.
+In this simulation, the signals obtained by the robot from anchors in
+a 2D environment are broadcast on the label and Distance Difference of
+Arrival (DDOA) values are transmitted via AnchorScan message.
+"""
+# !/usr/bin/env python
 # -- coding: utf-8 --
 # license removed for brevity
- 
-import rospy
-import time
-from datetime import datetime
-import std_msgs.msg
+
 from math import sqrt
-import numpy as np
 from random import randint
-from random import uniform
+import rospy
+import numpy as np
 from indoor_localization.msg import AnchorScan
-import collections
+
 
 def init_robot():
     """ Initialize the start location of robot randomly """
 
-    initial_Tx = float(100.0)                   # float(rospy.get_param("/simulator/initial_Tx")) 
-    initial_Ty = float(100.0)                   # float(rospy.get_param("/simulator/initial_Ty")) 
-    initial_Tz = float(1.10)                   # float(rospy.get_param("/simulator/initial_Tz"))
-    initial_angle = float(2 * np.pi* 0.2)       # float(2 * np.pi * np.random.rand())
+    initial_tag_x = float(100.0)                   # float(rospy.get_param("/simulator/initial_Tx"))
+    initial_tag_y = float(100.0)                   # float(rospy.get_param("/simulator/initial_Ty"))
+    initial_tag_z = float(1.10)                   # float(rospy.get_param("/simulator/initial_Tz"))
+    initial_angle = float(2 * np.pi * 0.2)       # float(2 * np.pi * np.random.rand())
 
-    initial_pos = list([initial_Tx, initial_Ty, initial_Tz, initial_angle])
+    initial_pos = list([initial_tag_x, initial_tag_y, initial_tag_z, initial_angle])
 
     return initial_pos
 
 
 def init_velocity():
+    """
+    Initialize the robot's velocity.
+    Unit: m/s
+    """
 
     velocity = float(1.0)       # (m/s)
     return velocity
@@ -40,20 +46,24 @@ def init_rate():
 
 
 def init_anchors():
+    """
+    Initialize the anchors' places and ID's.
+    Anchors are placed at 20 meter intervals in an environment.
+    """
 
     anchor_info = dict()
     anchor_id = list()
 
-    for x in range(20, 160, 20):
-        for y in range(20, 160, 20):
-            
+    for x_coord in range(20, 160, 20):
+        for y_coord in range(20, 160, 20):
+
             coord_list = list()
 
-            z = float(10.0)     # 4 + 3 * uniform(0, 1)
+            z_coord = float(10.0)     # 4 + 3 * uniform(0, 1)
 
-            coord_list.append(float(x))
-            coord_list.append(float(y))
-            coord_list.append(float(z))
+            coord_list.append(float(x_coord))
+            coord_list.append(float(y_coord))
+            coord_list.append(float(z_coord))
 
             anchor_id = randint(0, 100)
             anchor_info[anchor_id] = coord_list
@@ -61,9 +71,9 @@ def init_anchors():
     return anchor_info
 
 
-#----------------------------
+# ----------------------------
 def signal_received_anchors(anchor_info):
-    """ Bir bolgedeki 49 tane ankorun 10 tanesinden sinyal alindiigini varsayalim. """
+    """ Assume that we receive the signal from 10 anchors. """
 
     anchor_info_ids = list(anchor_info.keys())
     anchor_info_coords = list(anchor_info.values())        # all anchors in system
@@ -83,16 +93,17 @@ def signal_received_anchors(anchor_info):
 
 
 def min_ind_of_anch(anchor_info):
-    """ Minimum ID'nin kaçıncı indexte olduğunu bulur. """
-    
+    """  Finds the index of min ID. """
+
     anch_id = list(anchor_info.keys())
     min_id_ind = anch_id.index(min(anch_id))
 
     return min_id_ind
 
 
-def robot_harekete_basla(velocity, rate, initial_pos):
-    """ Robot starts to move with specified velocity.
+def robot_starts_move(velocity, rate, initial_pos):
+    """
+    Robot starts to move with specified velocity.
     When the robot hits to the edges, next move's angle is calculated.
     Robot's move ends when total drop number is 5.
     """
@@ -101,63 +112,55 @@ def robot_harekete_basla(velocity, rate, initial_pos):
     total_drop = 5      # number of drop to the edges
     drop_count = 0      # drop counter
     pos_count = 0       # position counter
-    
-    first_Tx = initial_pos[0]
-    first_Ty = initial_pos[1]
-    first_Tz = initial_pos[2]
+
+    first_tag_x = initial_pos[0]
+    first_tag_y = initial_pos[1]
+    first_tag_z = initial_pos[2]
     angle = initial_pos[3]
 
     coords_x = list()
     coords_y = list()
     coords_z = list()
 
-    coords_x.append(first_Tx)
-    coords_y.append(first_Ty)
-    coords_z.append(first_Tz)
+    coords_x.append(first_tag_x)
+    coords_y.append(first_tag_y)
+    coords_z.append(first_tag_z)
 
     while move:
 
-        new_Tx = first_Tx + np.cos(angle)*rate   # velocity * np.cos(angle)
-        new_Ty = first_Ty + np.sin(angle)*rate   # velocity * np.sin(angle)
-        new_Tz = first_Tz
+        new_tag_x = first_tag_x + np.cos(angle)*rate   # velocity * np.cos(angle)
+        new_tag_y = first_tag_y + np.sin(angle)*rate   # velocity * np.sin(angle)
+        new_tag_z = first_tag_z
         pos_count = pos_count + 1
 
-        coords_x.append(new_Tx)
-        coords_y.append(new_Ty)
-        coords_z.append(new_Tz)
+        coords_x.append(new_tag_x)
+        coords_y.append(new_tag_y)
+        coords_z.append(new_tag_z)
 
-        if new_Tx > 160:
-            #print('\n Tag sağ sınıra çarptı!')
+        if new_tag_x > 160:        # Tag droped to the right border
             angle = 2*np.pi - angle + np.pi
             drop_count = drop_count + 1
 
-
-        elif new_Tx < 0:
-            #print('\n Tag sol sınıra çarptı!')
+        elif new_tag_x < 0:        # Tag droped to the left border
             angle = 2*np.pi - angle + np.pi
             drop_count = drop_count + 1
 
-
-        elif new_Ty > 160:
-            #print('\n Tag üst sınıra çarptı!')
+        elif new_tag_y > 160:      # Tag droped to the upper border
             angle = 2*np.pi - angle
             drop_count = drop_count + 1
 
-
-        elif new_Ty < 0:
-            #print('\n Tag alt sınıra çarptı!')
+        elif new_tag_y < 0:        # Tag droped to the bottom border
             angle = 2*np.pi - angle
             drop_count = drop_count + 1
-
 
         if drop_count > total_drop:
             move = False
 
-        first_Tx = new_Tx
-        first_Ty = new_Ty
-        first_Tz = new_Tz
+        first_tag_x = new_tag_x
+        first_tag_y = new_tag_y
+        first_tag_z = new_tag_z
 
-    only_movable_positions= list()
+    only_movable_positions = list()
 
     for row in range(pos_count):
         only_movable_positions.append([coords_x[row], coords_y[row], coords_z[row]])
@@ -168,17 +171,15 @@ def robot_harekete_basla(velocity, rate, initial_pos):
 def calc_stop_pos(pos, count):
 
     stop_list = list()
-    
+
     for i in range(count):
         stop_list.append(pos)
-    
+
     return stop_list
 
 
 def add_stop_pos(only_movable_positions):
-    """ Olusturulan harekete durdugu pozisyonlar eklendi. """
-
-    print(len(only_movable_positions))
+    """ Stop positions are added to the movable positions. """
 
     stop1 = calc_stop_pos(only_movable_positions[150], 60)
     stop2 = calc_stop_pos(only_movable_positions[150+250], 60)
@@ -193,14 +194,14 @@ def add_stop_pos(only_movable_positions):
     positions_with_stop.extend(stop3)
     positions_with_stop.extend(only_movable_positions[(150+250+200):])
 
-    #new_pos_array = np.array(positions_with_stop)
-    #np.savetxt("new_pos_array.txt", new_pos_array)
+    # new_pos_array = np.array(positions_with_stop)
+    # np.savetxt("new_pos_array.txt", new_pos_array)
 
     return positions_with_stop
 
 
 def generate_radius(anchor_info, finalised_positions):
-    """ Sinyal alinabilen ankorların her birinin her bir konuma olan uzakligi """
+    """ Finds the each signal received anchors distances' to the tag positions. """
 
     anch_id = list(anchor_info.keys())
     anch_coord = list(anchor_info.values())
@@ -210,9 +211,9 @@ def generate_radius(anchor_info, finalised_positions):
     for row in range(len(finalised_positions)):
         one_pos_radius_dict = dict()
         for cnt_anch in range(len(anch_id)):
-            radius = sqrt(pow((finalised_positions[row][0]-anch_coord[cnt_anch][0]), 2) 
-                     + pow((finalised_positions[row][1]-anch_coord[cnt_anch][1]), 2) 
-                     + pow((finalised_positions[row][2]-anch_coord[cnt_anch][2]), 2))
+            radius = sqrt(pow((finalised_positions[row][0]-anch_coord[cnt_anch][0]), 2)
+                          + pow((finalised_positions[row][1]-anch_coord[cnt_anch][1]), 2)
+                          + pow((finalised_positions[row][2]-anch_coord[cnt_anch][2]), 2))
             one_pos_radius_dict[anch_id[cnt_anch]] = radius
         all_radius_list.append(one_pos_radius_dict)
 
@@ -220,8 +221,9 @@ def generate_radius(anchor_info, finalised_positions):
 
 
 def select_reference_radius(anchor_info, finalised_positions, all_radius_list, min_id_ind):
+    """ Selects the reference radius using the minimum ID of anchors. """
 
-    reference_radius = list()       # her pozisyon icin bir ref
+    reference_radius = list()       # reference for each position
     anch_id = list(anchor_info.keys())
 
     for row in range(len(finalised_positions)):
@@ -231,8 +233,15 @@ def select_reference_radius(anchor_info, finalised_positions, all_radius_list, m
     return reference_radius
 
 
-def generate_pure_ddoa(sig_anchor_info, finalised_positions, all_radius_list, reference_radius, min_id_ind):
-
+def generate_pure_ddoa(sig_anchor_info,
+                       finalised_positions,
+                       all_radius_list,
+                       reference_radius,
+                       min_id_ind):
+    """
+    This function generates the pure DDOA values using the reference radius and
+    all radiuses.
+    """
     pure_ddoa_all_pos = list()
     anch_id = list(sig_anchor_info.keys())
 
@@ -247,7 +256,7 @@ def generate_pure_ddoa(sig_anchor_info, finalised_positions, all_radius_list, re
 
             else:
                 pass
-        
+
         pure_ddoa_all_pos.append(pure_ddoa_one_pos)
 
     return pure_ddoa_all_pos
@@ -255,29 +264,40 @@ def generate_pure_ddoa(sig_anchor_info, finalised_positions, all_radius_list, re
 
 
 def publisher():
+    """
+    Publishes the Anchors' IDs, coordinates and ddoa values
+    via AnchorScan message over the /IPS topic.
+    """
 
     rospy.init_node("simulator", anonymous=True)
     pub = rospy.Publisher('IPS', AnchorScan, queue_size=2)
     rate = rospy.Rate(10)
-    
+
     initial_tag_pos = init_robot()
     velocity = init_velocity()
     pos_rate = init_rate()
     all_anchor_info = init_anchors()
-    #----------------------------
+    # ----------------------------
 
-    only_movable_positions = robot_harekete_basla(velocity, pos_rate, initial_tag_pos)
+    only_movable_positions = robot_starts_move(velocity, pos_rate, initial_tag_pos)
     finalised_positions = add_stop_pos(only_movable_positions)
-    
+
     sig_anchor_info = signal_received_anchors(all_anchor_info)
-    sig_anchor_id = list(sig_anchor_info.keys()) 
-    sig_anchor_coordinates = sig_anchor_info.values()         # coordinates
+    sig_anchor_id = list(sig_anchor_info.keys())
+    # sig_anchor_coordinates = sig_anchor_info.values()         # coordinates
 
     min_id_ind = min_ind_of_anch(sig_anchor_info)
 
     radius_list = generate_radius(sig_anchor_info, finalised_positions)
-    reference_radius = select_reference_radius(sig_anchor_info, finalised_positions, radius_list, min_id_ind)
-    pure_ddoa_list = generate_pure_ddoa(sig_anchor_info, finalised_positions, radius_list, reference_radius, min_id_ind)
+    reference_radius = select_reference_radius(sig_anchor_info,
+                                               finalised_positions,
+                                               radius_list,
+                                               min_id_ind)
+    pure_ddoa_list = generate_pure_ddoa(sig_anchor_info,
+                                        finalised_positions,
+                                        radius_list,
+                                        reference_radius,
+                                        min_id_ind)
 
     tmp_anchor_coords_x = list()
     tmp_anchor_coords_y = list()
@@ -302,8 +322,8 @@ def publisher():
 
         if cnt < len(finalised_positions) - 1:
             cnt = cnt + 1
-        else:     
-            print("\n\t\t END OF DATA \t\t\n")       
+        else:
+            print("\n\t\t END OF DATA \t\t\n")
             break       # pub.unregister()  !!!***!!!***!!!***!!!***!!!***!!!***!!!
         pub.publish(msg)
         rate.sleep()
@@ -314,4 +334,3 @@ if __name__ == '__main__':
         publisher()
     except rospy.ROSInterruptException:
         pass
-

@@ -26,8 +26,14 @@ CONTROL_SELECTED_ANCH = False
 
 
 def std_of_tdoa():
+    """
+    Return: Gc
+    Type  : float
+    """
+
     sig_c = float(rospy.get_param("/error_estimation_node/sig_c"))
     return sig_c
+
 
 # ----------------------------
 
@@ -205,7 +211,8 @@ def accuracy_pub_sub():
     rospy.Subscriber('selected_anchors', AnchorSelected, callback_selected_anchors)
     pub = rospy.Publisher('error', ErrorEstimated, queue_size=2)
 
-    rate = rospy.Rate(25)
+    rate = rospy.Rate(int(rospy.get_param("/kpi_calculation_node/rate")))
+
     sig_c = std_of_tdoa()
 
     while not rospy.is_shutdown():
