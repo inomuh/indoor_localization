@@ -32,6 +32,14 @@ class TestAnchorSelection(unittest.TestCase):
         'Tz': 0.5
     }
 
+    selected_anchors_dict_1D = {
+        'AnchorID': [0, 5],
+        'x': [120, 120],
+        'y': [200, 180],
+        'z': [4.203356, 5.483369],
+        'tdoa_of_anchors': [5]
+    }
+
 
 
 ##################################################################################################
@@ -744,7 +752,8 @@ class TestAnchorSelection(unittest.TestCase):
 
             ]
         )
-        tested = asn.all_combinations(position_list, comb_anch_tmp)
+        sig_c = 0.0625
+        tested = asn.all_combinations(position_list, comb_anch_tmp, sig_c)
         test_result = np.array(
             [0.0615985240956481,
              0.0755278692622397,
@@ -1293,6 +1302,56 @@ class TestAnchorSelection(unittest.TestCase):
         test_result = [-19.522421755, -8.835161558]
         self.assertAlmostEqual(tested[0], test_result[0], 4)
         self.assertAlmostEqual(tested[1], test_result[1], 4)
+    
+
+    def test_mode_1_select_anchors_except_2d(self):
+        mode = 1
+        tested = asn.select_anchors_except_2d(self.ips_dict, mode)
+        test_result = {
+            0: [120, 200, 4.203356],
+            5: [120, 180, 5.483369]
+        }
+        self.assertDictEqual(tested, test_result)
+
+
+    def test_mode_3_select_anchors_except_2d(self):
+        mode = 3
+        tested = asn.select_anchors_except_2d(self.ips_dict, mode)
+        test_result = {
+            0: [120, 200, 4.203356],
+            5: [120, 180, 5.483369],
+            6: [140, 200, 4.848520],
+            8: [140, 180, 5.861276]
+        }
+        self.assertDictEqual(tested, test_result)
+    
+
+    def test_mode_1_generate_selected_tdoa(self):
+        mode = 1
+        selected_anchors_dict = {
+            0: [120, 200, 4.203356],
+            5: [120, 180, 5.483369]
+        }
+        tag_index = np.array([155.0, 196.0, 0.5])
+        tested = asn.generate_selected_tdoa(selected_anchors_dict, mode, tag_index)
+        test_result = [3.383122267790938]
+        self.assertListEqual(tested, test_result)
+
+
+    def test_mode_3_generate_selected_tdoa(self):
+        mode = 3
+        tested = asn.select_anchors_except_2d(self.ips_dict, mode)
+        selected_anchors_dict = {
+            0: [120, 200, 4.203356],
+            5: [120, 180, 5.483369],
+            6: [140, 200, 4.848520],
+            8: [140, 180, 5.861276]
+        }
+        tag_index = np.array([155.0, 196.0, 0.5])
+        tested = asn.generate_selected_tdoa(selected_anchors_dict, mode, tag_index)
+        test_result = [-12.844459291960657, 3.383122267790938, -19.300241408988885]
+        self.assertListEqual(tested, test_result)
+        
 
 
 if __name__ == '__main__':
