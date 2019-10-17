@@ -57,7 +57,8 @@
   <build_depend>rospy</build_depend>
   <build_depend>rostest</build_depend>
   <build_depend>roslint</build_depend>
-  <build_depend>plab_comm</build_depend>
+  <build_depend>uwb_hardware_driver</build_depend>
+  <!-- <build_depend>plab_comm</build_depend> -->
 
   <build_export_depend>geometry_msgs</build_export_depend>
   <build_export_depend>std_msgs</build_export_depend>
@@ -66,7 +67,8 @@
   <build_export_depend>rospy</build_export_depend>
   <build_export_depend>rostest</build_export_depend>
   <build_export_depend>message_runtime</build_export_depend>
-  <build_export_depend>plab_comm</build_export_depend>
+  <build_export_depend>uwb_hardware_driver</build_export_depend>
+  <!-- <build_export_depend>plab_comm</build_export_depend> -->
 
   <exec_depend>geometry_msgs</exec_depend>
   <exec_depend>std_msgs</exec_depend>
@@ -74,7 +76,8 @@
   <exec_depend>rospy</exec_depend>
   <exec_depend>rostest</exec_depend>
   <exec_depend>message_runtime</exec_depend>
-  <exec_depend>plab_comm</exec_depend>
+  <exec_depend>uwb_hardware_driver</exec_depend>
+  <!-- <exec_depend>plab_comm</exec_depend> -->
 
   <test_depend>rosunit</test_depend>
 

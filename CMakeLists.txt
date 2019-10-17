@@ -68,7 +68,8 @@ generate_messages(
   DEPENDENCIES
   geometry_msgs
   std_msgs
-  plab_comm
+  # plab_comm
+  uwb_hardware_driver
 )
 
 ################################################
@@ -104,15 +105,15 @@ generate_messages(
 ## need
 catkin_package(
   # INCLUDE_DIRS include
-  LIBRARIES indoor_localization plab_comm
-  CATKIN_DEPENDS geometry_msgs message_generation roscpp rospy rostest plab_comm
+  LIBRARIES indoor_localization uwb_hardware_driver # plab_comm
+  CATKIN_DEPENDS geometry_msgs message_generation roscpp rospy rostest uwb_hardware_driver # plab_comm
   DEPENDS system_lib
 )
 
 # roslint_python(src/indoor_localization/anchor_selection_node.py)
 # roslint_python(src/indoor_localization/positioning_node.py)
 # roslint_python(src/indoor_localization/error_estimation_node.py)
-roslint_python(src/indoor_localization/kpi_calculation_node.py)
+# roslint_python(src/indoor_localization/kpi_calculation_node.py)
 
 
 ###########
