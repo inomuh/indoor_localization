@@ -36,7 +36,6 @@
 import time
 import rospy
 
-# 
 from hardware_driver_pkg.msg import AnchorScan
 
 
@@ -72,12 +71,24 @@ def anchor_data_publisher():
 
 
         msg.AnchorID = [101, 102, 103, 104]         # IDs of anchors.
+                                                    # This value must be read from the sensor.
+                                                    # This is the example of the content.
 
         msg.x = [2.675, 3.42, 12.475, 12.473]       # x coordinates of anchors
+                                                    # This value must be read from the sensor.
+                                                    # This is the example of the content.
+                
         msg.y = [-0.09, 4.58, -0.015, 4.543]        # y coordinates of anchors
+                                                    # This value must be read from the sensor.
+                                                    # This is the example of the content.
+                
         msg.z = [1.94, 2.07, 2.4, 2.35]             # z coordinates of anchors
+                                                    # This value must be read from the sensor.
+                                                    # This is the example of the content.
 
         msg.tdoa_of_anchors = [TDOA_102_101, TDOA_103_101, TDOA_104_101]    # TDOA values of anchors
+                                                                            # This value must be read from the sensor.
+                                                                            # This is the example of the content.
         
         pub.publish(msg)	
         rate.sleep()	
