@@ -28,7 +28,7 @@ def localization_mode():
 
 def get_tag_z():
 
-    tag_z = float(rospy.get_param("/positioning_node/TZ"))
+    tag_z = float(rospy.get_param("/positioning_node/tag_z"))
     return tag_z
 
 
@@ -111,7 +111,11 @@ def find_anchor_s(min_id_ind,
                   selected_x,
                   selected_y,
                   selected_z):
-
+    """
+    Finds the anchor S using the minimum ID of selected anchors.
+    S anchor must be the anchor which has the minimum ID in selected
+    anchors.
+    """
     s_x = selected_x[min_id_ind]
     s_y = selected_y[min_id_ind]
     s_z = selected_z[min_id_ind]
@@ -125,6 +129,7 @@ def find_anchor_a(tmp_sel_anch_dict,
                   selected_x,
                   selected_y,
                   selected_z):
+    """ Finds the anchor A. """
 
     for i in range(len(tmp_sel_anch_dict['AnchorID'])):
         if i != min_id_ind:
@@ -141,6 +146,7 @@ def find_anchor_b(tmp_sel_anch_dict,
                   selected_x,
                   selected_y,
                   selected_z):
+    """ Finds the anchor B. """
 
     for i in range(len(tmp_sel_anch_dict['AnchorID'])):
         if (i != min_id_ind) and (i != anch_a_ind):
@@ -158,6 +164,7 @@ def find_anchor_c(tmp_sel_anch_dict,
                   selected_x,
                   selected_y,
                   selected_z):
+    """ Finds the anchor C. """
 
     for i in range(len(tmp_sel_anch_dict['AnchorID'])):
         if (i != min_id_ind) and (i != anch_a_ind) and (i != anch_b_ind):
@@ -230,11 +237,11 @@ def calc_dist_1d_2a_ite(anch_s, anch_a,
                 )
             )
 
-        m = float(-(val_n + (2*dist_diff_a_s*radius_s))/val_q)
+        val_m = float(-(val_n + (2*dist_diff_a_s*radius_s))/val_q)
 
-        tag_x_new = float(line_start_x + m*(line_end_x - line_start_x))
-        tag_y_new = float(line_start_y + m*(line_end_y - line_start_y))
-        tag_z_new = float(line_start_z + m*(line_end_z - line_start_z))
+        tag_x_new = float(line_start_x + val_m*(line_end_x - line_start_x))
+        tag_y_new = float(line_start_y + val_m*(line_end_y - line_start_y))
+        tag_z_new = float(line_start_z + val_m*(line_end_z - line_start_z))
 
         diff = float(
             sqrt(
@@ -519,8 +526,11 @@ def position_pub_sub():
     rospy.Subscriber('selected_anchors', AnchorSelected, callback_selected_anchors)
     pub = rospy.Publisher('position', PositionInfo, queue_size=2)
 
-    rate = rospy.Rate(25)
+    rate = rospy.Rate(int(rospy.get_param("/kpi_calculation_node/rate")))
+
     mode = localization_mode()
+
+    cnt = 0
 
     while not rospy.is_shutdown():
         msg = PositionInfo()
@@ -582,6 +592,7 @@ def position_pub_sub():
                                               selected_tdoa[1], selected_tdoa[0])
 
                 # print("\tCalculated pos: " + str(position))
+                cnt += 1
                 msg.Tx = position[0]
                 msg.Ty = position[1]
                 msg.Tz = position[2]
