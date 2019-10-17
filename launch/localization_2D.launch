@@ -1,9 +1,10 @@
 <?xml version="1.0"?>
 <launch>
 
-	<node pkg="indoor_localization" name="hardware_ros_driver" type="hardware_ros_driver.py" output="screen"/>
-
 	<!--
+	<node pkg="indoor_localization" name="plab_data_publisher" type="plab_data_publisher.py" output="screen"/>
+
+	
 	<node pkg="indoor_localization" name="simulator" type="simulator.py" output="screen">
 		<rosparam file="$(find indoor_localization)/params/localization_params.yaml" command="load"/>
 	</node>
