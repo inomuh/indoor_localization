@@ -10,7 +10,8 @@ import rospy
 import numpy as np
 from numpy import linalg as LA
 
-from plab_comm.msg import AnchorScan
+# from plab_comm.msg import AnchorScan
+from uwb_hardware_driver.msg import AnchorScan
 from indoor_localization.msg import PositionInfo
 from indoor_localization.msg import AnchorSelected
 
