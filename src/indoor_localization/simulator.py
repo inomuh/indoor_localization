@@ -270,7 +270,7 @@ def publisher():
     """
 
     rospy.init_node("simulator", anonymous=True)
-    pub = rospy.Publisher('IPS', AnchorScan, queue_size=2)
+    pub = rospy.Publisher('ips', AnchorScan, queue_size=2)
     rate = rospy.Rate(10)
 
     initial_tag_pos = init_robot()

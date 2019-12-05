@@ -507,7 +507,7 @@ def generate_selected_tdoa(selected_anchors_dict, mode, tag_index):
 def anchor_pub_sub():
 
     rospy.init_node('anchor_selection_node', anonymous=True)
-    rospy.Subscriber('IPS', AnchorScan, callback_ips)
+    rospy.Subscriber('ips', AnchorScan, callback_ips)
     rospy.Subscriber('position', PositionInfo, callback_last_pos)
     pub = rospy.Publisher('selected_anchors', AnchorSelected, queue_size=2)
 
