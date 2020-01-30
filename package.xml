@@ -25,7 +25,6 @@
   <build_depend>rostest</build_depend>
   <build_depend>roslint</build_depend>
   <build_depend>uwb_hardware_driver</build_depend>
-  <build_depend>libjsoncpp-dev</build_depend>
   <!-- <build_depend>plab_comm</build_depend> -->
 
   <build_export_depend>geometry_msgs</build_export_depend>
@@ -45,7 +44,6 @@
   <exec_depend>rostest</exec_depend>
   <exec_depend>message_runtime</exec_depend>
   <exec_depend>uwb_hardware_driver</exec_depend>
-  <exec_depend>libjsoncpp</exec_depend>
   <!-- <exec_depend>plab_comm</exec_depend> -->
 
   <test_depend>rosunit</test_depend>
