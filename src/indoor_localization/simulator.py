@@ -1,12 +1,13 @@
+#!/usr/bin/env python3
+# -- coding: utf-8 --
+# license removed for brevity
+
 """
     This module simulates the movement of a robot on a flat surface.
 In this simulation, the signals obtained by the robot from anchors in
 a 2D environment are broadcast on the label and Distance Difference of
 Arrival (DDOA) values are transmitted via AnchorScan message.
 """
-# !/usr/bin/env python
-# -- coding: utf-8 --
-# license removed for brevity
 
 from math import sqrt
 from random import randint
